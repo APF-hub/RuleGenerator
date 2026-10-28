@@ -1,0 +1,39 @@
+{
+  "date": "2026-10-28",
+  "sample_rate": 8000,
+  "samples": 1024,
+  "budget_per_method": 120,
+  "tests_passed": "13/13 local M70-M73",
+  "cases": [
+    {
+      "name": "single",
+      "baseline_mse": 4.170854430799506e-29,
+      "residual_mse": 1.790832052929466e-33,
+      "events": 1
+    },
+    {
+      "name": "overlap",
+      "baseline_mse": 7.65596100445194e-29,
+      "residual_mse": 1.0220650812204269e-31,
+      "events": 2
+    },
+    {
+      "name": "sequence",
+      "baseline_mse": 0.03530111491774811,
+      "residual_mse": 6.490934281176902e-33,
+      "events": 2
+    },
+    {
+      "name": "3tone",
+      "baseline_mse": 9.388155704277062e-29,
+      "residual_mse": 7.746058982565825e-32,
+      "events": 4
+    }
+  ],
+  "limitations": [
+    "Synthetic frequencies aligned to FFT analysis windows",
+    "Candidate execution budget excludes proposal-generation and least-squares cost",
+    "Event grammar is audio-specific and separate from canonical typed AST",
+    "Remote CI not verified"
+  ]
+}
