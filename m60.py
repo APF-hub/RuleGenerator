@@ -92,7 +92,13 @@ class Registry:
         if not row:raise KeyError(name)
         body,arg_types,out_type=json.loads(row[0]),json.loads(row[1]),json.loads(row[2])
         s={}
-        if len(args)!=len(arg_types):raise TypeError("arity")
+        if len(args)!=len(arg_types):
+            # Legacy M61 discovered a unary function over a pair, but its
+            # published call API supplies the two pair elements separately.
+            if len(arg_types)==1 and len(args)==2 and arg_types[0][0]=="ctor" and arg_types[0][1]=="Pair":
+                args=(tuple(args),)
+            else:
+                raise TypeError("arity")
         for x,t in zip(args,arg_types):s=unify(resolve(t,s),value_type(x),s)
         result=evaluate(body,args)
         unify(resolve(out_type,s),value_type(result))
