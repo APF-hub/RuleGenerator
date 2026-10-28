@@ -21,7 +21,7 @@ def _key(node):
     return json.dumps(node,sort_keys=True,separators=(",",":"))
 
 def synthesize_functional(rows,registry=None,*,tier="math",max_nodes=7,
-                          budget=2000,constants=(0,1,2),reuse=True):
+                          budget=2000,constants=(0,1,2),reuse=True,max_generated=10000):
     """Rows: (environment_dict, expected_output), with consistent input types.
 
     Enumerates expressions by AST node count; learned operator calls cost one
@@ -29,7 +29,7 @@ def synthesize_functional(rows,registry=None,*,tier="math",max_nodes=7,
     time, and excludes the acquisition/validation cost of learned operators.
     """
     if not rows:raise ValueError("observations required")
-    if max_nodes<1 or budget<1:raise ValueError("positive limits required")
+    if max_nodes<1 or budget<1 or max_generated<1:raise ValueError("positive limits required")
     core=(registry.core() if registry is not None and reuse else Core(tier))
     env_type={k:core._runtime_type(v) for k,v in rows[0][0].items()}
     for env,_ in rows:
@@ -48,6 +48,10 @@ def synthesize_functional(rows,registry=None,*,tier="math",max_nodes=7,
                 if name in core.definitions or name in __import__("rulegen.functional",fromlist=["TIERS"]).TIERS[core.tier]}
     pool={1:[variable(k) for k in sorted(env_type)]+[literal(v) for v in constants]}
     seen=set()
+    generated=len(pool[1])
+    if generated>max_generated:
+        return {"program":None,"checks":0,"type_pruned":0,
+                "runtime_errors":0,"exhausted":True}
     checks=0;type_pruned=0;runtime_errors=0
     for size in range(1,max_nodes+1):
         if size>1:
@@ -57,7 +61,11 @@ def synthesize_functional(rows,registry=None,*,tier="math",max_nodes=7,
                 for sizes in itertools.product(range(1,size),repeat=arity):
                     if sum(sizes)!=size-1:continue
                     for args in itertools.product(*(pool[s] for s in sizes)):
+                        if generated>=max_generated:
+                            return {"program":None,"checks":checks,"type_pruned":type_pruned,
+                                    "runtime_errors":runtime_errors,"exhausted":True}
                         pool[size].append(call(name,*args))
+                        generated+=1
         for expr in pool[size]:
             key=_key(expr)
             if key in seen:continue
