@@ -38,7 +38,7 @@ class FunctionalCoreTests(unittest.TestCase):
         definition = {
             "params":[{"name":"a","type":REAL},{"name":"f","type":REAL},{"name":"t","type":REAL}],
             "return_type":REAL,
-            "body":call("*",var("a"),call("sin",call("*",var("f"),var("t")))
+            "body":call("*",var("a"),call("sin",call("*",var("f"),var("t"))))
         }
         c.validate_definition("wave",definition)
         self.assertAlmostEqual(c.execute(call("wave",lit(0.4),lit(2.0),lit(0.5))),0.4*math.sin(1))
