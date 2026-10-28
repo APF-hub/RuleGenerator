@@ -26,6 +26,12 @@ class AtomicSchemaInitTests(unittest.TestCase):
                 with registry(path):
                     pass
 
+    def test_standalone_evidence_constructor(self):
+        with sqlite3.connect(":memory:") as db:
+            Evidence(db)
+            self.assertFalse(db.in_transaction)
+            self.assertEqual(db.execute("SELECT COUNT(*) FROM rg_metadata").fetchone()[0],1)
+
     def test_evidence_does_not_commit_caller_transaction(self):
         with sqlite3.connect(":memory:") as db:
             db.execute("BEGIN IMMEDIATE")
