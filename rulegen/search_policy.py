@@ -37,7 +37,7 @@ class ExperiencePolicy:
         return tuple(dict.fromkeys([*learned,*suggested_operators(features)]))
 
 
-def guided_synthesize(registry,rows,*,policy=None,mode="feature",**limits):
+def guided_synthesize(registry,rows,*,policy=None,mode="feature",record_experience=False,**limits):
     features=extract_features(rows)
     if mode=="baseline":priority=None
     elif mode=="feature":priority=suggested_operators(features)
@@ -46,6 +46,6 @@ def guided_synthesize(registry,rows,*,policy=None,mode="feature",**limits):
         priority=policy.priorities(features)
     else:raise ValueError("unknown mode")
     result=synthesize(registry,rows,operator_priority=priority,**limits)
-    if mode=="learned" and result["program"] is not None:
+    if mode=="learned" and record_experience and result["program"] is not None:
         policy.observe(features,result["program"],result["checks"])
     return dict(result,features=features,mode=mode,operator_priority=priority)
