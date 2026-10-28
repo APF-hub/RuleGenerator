@@ -1,4 +1,4 @@
-from .cancellation import check_cancel
+from .cancellation import check_cancel, make_deadline
 """Goal-directed typed-hole enumeration with constraint propagation.
 
 Every partial expression carries a required output type. Unification prunes
@@ -13,19 +13,19 @@ class GenerationLimitReached(Exception):
 from .engine import PRIMS, V, typ, fresh, unify, substitute, typecheck, encode
 
 
-def enumerate_goal(goal, input_type, operators=None, max_nodes=5, max_generated=10000, cancel=None):
+def enumerate_goal(goal, input_type, operators=None, max_nodes=5, max_generated=10000, cancel=None, deadline=None):
     if type(max_nodes) is not int or max_nodes<1 or type(max_generated) is not int or max_generated<1:
         raise ValueError('positive integer limits required')
     operators = operators or {}
     serial=count()
     stats={'type_pruned':0,'expanded_holes':0,'generated':0}
     def consume():
-        check_cancel(cancel)
+        check_cancel(cancel,deadline)
         if stats['generated']>=max_generated:
             raise GenerationLimitReached()
         stats['generated']+=1
     def build(required, size, subst):
-        check_cancel(cancel)
+        check_cancel(cancel,deadline)
         stats['expanded_holes']+=1
         required=substitute(required,subst)
         if size==1:
@@ -79,25 +79,27 @@ def enumerate_goal(goal, input_type, operators=None, max_nodes=5, max_generated=
     return iterator(),stats
 
 
-def synthesize_goal(registry,rows,max_nodes=5,budget=10000,reuse=True,max_generated=10000,cancel=None):
+def synthesize_goal(registry,rows,max_nodes=5,budget=10000,reuse=True,max_generated=10000,cancel=None,timeout_seconds=None):
     """Find first matching program, retaining sound observation-scoped failures."""
     from .engine import execute,hash_of
     if not rows:raise ValueError('no observations')
     if type(budget) is not int or budget<1:
         raise ValueError('positive integer budget required')
+    deadline=make_deadline(timeout_seconds)
+    check_cancel(cancel,deadline)
     ti,to=typ(rows[0][0]),typ(rows[0][1]);scope=hash_of(['typedholes-v1',rows])
     ops=registry.active() if reuse else {}
-    candidates,stats=enumerate_goal(to,ti,ops,max_nodes,max_generated,cancel)
+    candidates,stats=enumerate_goal(to,ti,ops,max_nodes,max_generated,cancel,deadline)
     try:
-        return _evaluate_candidates(candidates,stats,registry,scope,rows,ops,budget,cancel)
+        return _evaluate_candidates(candidates,stats,registry,scope,rows,ops,budget,cancel,deadline)
     except GenerationLimitReached:
         return {'program':None,'checks':stats.get('checks',0),'failure_skips':stats.get('skips',0),'exhausted':True,'stats':stats}
 
-def _evaluate_candidates(candidates,stats,registry,scope,rows,ops,budget,cancel):
+def _evaluate_candidates(candidates,stats,registry,scope,rows,ops,budget,cancel,deadline):
     from .engine import execute
     checks=skips=0
     for e in candidates:
-        check_cancel(cancel)
+        check_cancel(cancel,deadline)
         stats['checks']=checks
         stats['skips']=skips
         if registry.failed(scope,e):
