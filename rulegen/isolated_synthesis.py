@@ -8,7 +8,7 @@ from .process_isolation import IsolatedExecutionError
 
 def synthesize_functional_isolated(rows, *, tier="math", budget=2000,
                                    max_nodes=5, max_generated=10000,
-                                   timeout_seconds=10, memory_bytes=None):
+                                   timeout_seconds=10, memory_bytes=None, definitions=None):
     """Enforce wall-clock deadline and optional POSIX address-space ceiling.
 
     Does not support registry reuse; only JSON-serializable observations.
@@ -17,7 +17,7 @@ def synthesize_functional_isolated(rows, *, tier="math", budget=2000,
         raise ValueError("limits must be integers")
     if any(not 1<=n<=100000 for n in (budget,max_nodes,max_generated)):
         raise ValueError("limits out of range")
-    if tier not in ("math","algebra"):
+    if tier not in ("math","algebra","functional"):
         raise ValueError("unsupported tier")
     if not isinstance(rows,(list,tuple)) or not 1<=len(rows)<=1000:
         raise ValueError("invalid observations")
@@ -30,7 +30,11 @@ def synthesize_functional_isolated(rows, *, tier="math", budget=2000,
     import os
     if memory_bytes is not None and os.name!="posix":
         raise NotImplementedError("memory limit requires POSIX")
-    request={"rows":rows,"tier":tier,"budget":budget,
+    if definitions is None:
+        definitions={}
+    if not isinstance(definitions,dict) or len(definitions)>100:
+        raise ValueError("invalid operator snapshot")
+    request={"rows":rows,"tier":tier,"definitions":definitions,"budget":budget,
              "max_nodes":max_nodes,"max_generated":max_generated}
     payload=json.dumps(request,allow_nan=False).encode()
     if len(payload)>1048576:
