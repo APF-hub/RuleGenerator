@@ -5,13 +5,23 @@ impossible operator signatures before constructing children. The primitive
 basis remains an explicit inductive bias, not a learned operator grammar.
 """
 from itertools import count
+
+class GenerationLimitReached(Exception):
+    """Candidate construction reached the configured cap."""
+
 from .engine import PRIMS, V, typ, fresh, unify, substitute, typecheck, encode
 
 
-def enumerate_goal(goal, input_type, operators=None, max_nodes=5):
+def enumerate_goal(goal, input_type, operators=None, max_nodes=5, max_generated=10000):
+    if type(max_nodes) is not int or max_nodes<1 or type(max_generated) is not int or max_generated<1:
+        raise ValueError('positive integer limits required')
     operators = operators or {}
     serial=count()
     stats={'type_pruned':0,'expanded_holes':0,'generated':0}
+    def consume():
+        if stats['generated']>=max_generated:
+            raise GenerationLimitReached()
+        stats['generated']+=1
     def build(required, size, subst):
         stats['expanded_holes']+=1
         required=substitute(required,subst)
@@ -21,7 +31,7 @@ def enumerate_goal(goal, input_type, operators=None, max_nodes=5):
             for e,t in leaves:
                 try:
                     s=unify(required,t,subst)
-                    stats['generated']+=1
+                    consume()
                     yield e,s
                 except TypeError:stats['type_pruned']+=1
             return
@@ -44,7 +54,7 @@ def enumerate_goal(goal, input_type, operators=None, max_nodes=5):
             for sizes in partitions(size-1,arity):
                 def children(i,chosen,state):
                     if i==arity:
-                        stats['generated']+=1
+                        consume()
                         yield ['call',name,*chosen],state
                         return
                     for e,s2 in build(substitute(args[i],state),sizes[i],state):
@@ -66,15 +76,27 @@ def enumerate_goal(goal, input_type, operators=None, max_nodes=5):
     return iterator(),stats
 
 
-def synthesize_goal(registry,rows,max_nodes=5,budget=10000,reuse=True):
+def synthesize_goal(registry,rows,max_nodes=5,budget=10000,reuse=True,max_generated=10000):
     """Find first matching program, retaining sound observation-scoped failures."""
     from .engine import execute,hash_of
     if not rows:raise ValueError('no observations')
+    if type(budget) is not int or budget<1:
+        raise ValueError('positive integer budget required')
     ti,to=typ(rows[0][0]),typ(rows[0][1]);scope=hash_of(['typedholes-v1',rows])
     ops=registry.active() if reuse else {}
-    candidates,stats=enumerate_goal(to,ti,ops,max_nodes)
+    candidates,stats=enumerate_goal(to,ti,ops,max_nodes,max_generated)
+    checks=skips=0
+    try:
+        return _evaluate_candidates(candidates,stats,registry,scope,rows,ops,budget)
+    except GenerationLimitReached:
+        return {'program':None,'checks':stats.get('checks',0),'failure_skips':stats.get('skips',0),'exhausted':True,'stats':stats}
+
+def _evaluate_candidates(candidates,stats,registry,scope,rows,ops,budget):
+    from .engine import execute
     checks=skips=0
     for e in candidates:
+        stats['checks']=checks
+        stats['skips']=skips
         if registry.failed(scope,e):skips+=1;continue
         if checks>=budget:return {'program':None,'checks':checks,'failure_skips':skips,'exhausted':True,'stats':stats}
         checks+=1
