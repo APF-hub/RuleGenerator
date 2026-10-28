@@ -15,14 +15,16 @@ def canonical(value):
 def fingerprint(value):
     return hashlib.sha256(canonical(value).encode()).hexdigest()
 
-def evaluate_backend(backend,rows,registry,*,budget,max_nodes=5,reuse=True):
+def evaluate_backend(backend,rows,registry,*,budget,max_nodes=5,reuse=True,max_generated=10000):
     """Return a comparable record, without claiming equivalent search spaces."""
     if type(budget) is not int or budget<1:
         raise ValueError("budget must be a positive integer")
     if type(max_nodes) is not int or max_nodes<1:
         raise ValueError("max_nodes must be a positive integer")
+    if type(max_generated) is not int or max_generated<1:
+        raise ValueError("max_generated must be a positive integer")
     if backend=="legacy":
-        result=legacy_synthesize(registry,rows,max_nodes=max_nodes,budget=budget,reuse=reuse)
+        result=legacy_synthesize(registry,rows,max_nodes=max_nodes,budget=budget,reuse=reuse,max_generated=max_generated)
     elif backend=="legacy-goal":
         result=synthesize_goal(registry,rows,max_nodes=max_nodes,budget=budget,reuse=reuse)
     elif backend=="functional":
@@ -32,7 +34,7 @@ def evaluate_backend(backend,rows,registry,*,budget,max_nodes=5,reuse=True):
     if type(result["checks"]) is not int or not 0<=result["checks"]<=budget:
         raise RuntimeError("backend violated evaluation budget")
     return {"schema_version":1,"backend":backend,"observations_digest":fingerprint(rows),
-            "budget":budget,"max_nodes":max_nodes,"reuse":reuse,
+            "budget":budget,"max_nodes":max_nodes,"max_generated":max_generated,"reuse":reuse,
             "checks":result["checks"],"solved":result["program"] is not None,
             "program":result["program"],"exhausted":result["exhausted"],
             "type_pruned":result.get("type_pruned",result.get("stats",{}).get("type_pruned")),
