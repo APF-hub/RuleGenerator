@@ -56,3 +56,10 @@ M62 local archive packages the fuller M60–M61 typed synthesizer as `rulegen.en
 The scheduler reserves every Nth decision for the least-funded research direction; otherwise it favours directions with measured validated improvement per cost, and tries untested directions. This is an auditable heuristic, not an optimal bandit. Held-out comparability and fixed-budget baselines are still needed.
 
 Next: migrate the full consolidated package to GitHub, enable CI, integrate scoped failure learning and typed holes, and run matched-budget longitudinal benchmarks.
+
+
+## M63: Goal-directed typed holes and allocation controls
+
+The M63 local archive adds `rulegen.typedholes` (top-down type-constraint propagation) and `rulegen.benchmark` (deterministic adaptive/round-robin/random allocation controls). Nine local tests pass. In a deliberately favorable **simulated** 30-trial allocation experiment, adaptive achieved validated gain 45 vs round-robin 30 and random 29, all at cost 60. These are **not** observed real-synthesis improvements.
+
+A Python CI workflow is now in this repository. **Release blocker:** the full canonical package is not yet imported; see issue #1. The standalone GitHub code and the local M63 archive are not yet equivalent. Do not interpret CI on the standalone modules as validation of the local consolidated package.
