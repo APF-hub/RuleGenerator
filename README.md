@@ -27,3 +27,21 @@ The implementation and reproducible tests are packaged separately as `rule-disco
 3. Learned search policy with exploration and controlled ablations.
 4. Generic audio-to-program induction using elementary primitives.
 5. Multi-seed held-out tests, CI and durable versioned rule registry.
+
+
+## M61: Autonomous operator discovery (2026-10-28)
+
+Run `python -m unittest -v test_m61_discovery.py` and `python m61_discovery.py`.
+
+M61 searches for an operator body from input/output examples, then derives and validates a polymorphic signature. It can discover pair swapping from integer/Boolean observations and validate it on list/Boolean pairs. This is **restricted combinator synthesis**, not invention of arbitrary algorithms or type constructors.
+
+The separate downloadable M61 research archive contains the full local M60 synthesizer, a more extensive M61 benchmark, and six passing local tests. The GitHub version is a smaller, registry-compatible implementation; GitHub tests are not yet verified in CI.
+
+**Measured local research benchmark:** 17 discovery evaluations; target baseline 17; target with learned operator 1; acquisition plus one reuse 18. Thus there is no net benefit after a single reuse. More repeated targets and full cost accounting are needed.
+
+### Engineering priorities
+1. Consolidate the separate M55–M61 prototypes into one tested package.
+2. Fix typed-hole propagation, fresh polymorphic variable handling, and observation-scoped negative knowledge.
+3. Add continuous integration, benchmark manifests and reproducible environment.
+4. Learn recursive and higher-order abstractions and type constructors without task-specific hints.
+5. Evaluate on diverse held-out programs and raw audio, including negative controls.
