@@ -137,6 +137,8 @@ class Registry:
         self.db.execute('''CREATE TABLE IF NOT EXISTS operators(name TEXT PRIMARY KEY, body TEXT, args TEXT, output TEXT, evidence TEXT, status TEXT)''')
         self.db.execute('''CREATE TABLE IF NOT EXISTS failures(scope TEXT, candidate TEXT, reason TEXT, PRIMARY KEY(scope,candidate))''')
         self.db.commit()
+        from .evidence import Evidence
+        self.evidence=Evidence(self.db)
     def close(self):
         self.db.close()
     def __del__(self):
