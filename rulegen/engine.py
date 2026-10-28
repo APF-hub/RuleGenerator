@@ -210,35 +210,67 @@ def synthesize(registry,rows,max_nodes=4,budget=10000,reuse=True,max_generated=1
     generated=len(pool[1])
     if generated>max_generated:
         return {'program':None,'checks':0,'type_pruned':0,'failure_skips':0,'exhausted':True}
+    def evaluate_candidate(expr):
+        nonlocal checks,type_pruned,fail_skipped
+        signature=encode(expr)
+        if signature in seen:return False
+        seen.add(signature)
+        try:unify(typecheck(expr,ti,ops),to)
+        except TypeError:
+            type_pruned+=1
+            return False
+        if registry.failed(scope,expr):
+            fail_skipped+=1
+            return False
+        if checks>=budget:return None
+        checks+=1
+        try:valid=all(execute(expr,x,ops)==y for x,y in rows)
+        except (TypeError,ValueError,RecursionError,OverflowError):valid=False
+        if valid:return True
+        registry.record_failure(scope,expr,'observational_mismatch')
+        return False
+
     for n in range(1,max_nodes+1):
         check_cancel(cancel,deadline)
-        if n>1:
+        if n==1:
+            candidates=pool[1]
+        else:
             pool[n]=[]
-            for name in list(PRIMS)+list(ops):
-                arity=len(PRIMS[name][0]) if name in PRIMS else len(ops[name]['args'])
-                for sizes in itertools.product(range(1,n),repeat=arity):
-                    if sum(sizes)!=n-1:continue
-                    for args in itertools.product(*(pool[s] for s in sizes)):
-                        check_cancel(cancel,deadline)
-                        expr=['call',name,*args]
-                        try:typecheck(expr,ti,ops)
-                        except TypeError:type_pruned+=1;continue
-                        if generated>=max_generated:
-                            return {'program':None,'checks':checks,'type_pruned':type_pruned,'failure_skips':fail_skipped,'exhausted':True}
-                        pool[n].append(expr)
-                        generated+=1
-        for expr in pool[n]:
-            check_cancel(cancel,deadline)
-            signature=encode(expr)
-            if signature in seen:continue
-            seen.add(signature)
-            try:unify(typecheck(expr,ti,ops),to)
-            except TypeError:type_pruned+=1;continue
-            if registry.failed(scope,expr):fail_skipped+=1;continue
-            if checks>=budget:return {'program':None,'checks':checks,'type_pruned':type_pruned,'failure_skips':fail_skipped,'exhausted':True}
-            checks+=1
-            try:valid=all(execute(expr,x,ops)==y for x,y in rows)
-            except (TypeError,ValueError,RecursionError,OverflowError):valid=False
-            if valid:return {'program':expr,'checks':checks,'type_pruned':type_pruned,'failure_skips':fail_skipped,'exhausted':False}
-            registry.record_failure(scope,expr,'observational_mismatch')
+            # Incremental evaluation: do not discard an entire partially
+            # generated layer when the generation cap is reached.
+            candidates=None
+        if candidates is not None:
+            for expr in candidates:
+                check_cancel(cancel,deadline)
+                verdict=evaluate_candidate(expr)
+                if verdict is True:
+                    return {'program':expr,'checks':checks,'type_pruned':type_pruned,
+                            'failure_skips':fail_skipped,'exhausted':False}
+                if verdict is None:
+                    return {'program':None,'checks':checks,'type_pruned':type_pruned,
+                            'failure_skips':fail_skipped,'exhausted':True}
+            continue
+        for name in list(PRIMS)+list(ops):
+            arity=len(PRIMS[name][0]) if name in PRIMS else len(ops[name]['args'])
+            for sizes in itertools.product(range(1,n),repeat=arity):
+                if sum(sizes)!=n-1:continue
+                for args in itertools.product(*(pool[s] for s in sizes)):
+                    check_cancel(cancel,deadline)
+                    expr=['call',name,*args]
+                    try:typecheck(expr,ti,ops)
+                    except TypeError:
+                        type_pruned+=1
+                        continue
+                    if generated>=max_generated:
+                        return {'program':None,'checks':checks,'type_pruned':type_pruned,
+                                'failure_skips':fail_skipped,'exhausted':True}
+                    pool[n].append(expr)
+                    generated+=1
+                    verdict=evaluate_candidate(expr)
+                    if verdict is True:
+                        return {'program':expr,'checks':checks,'type_pruned':type_pruned,
+                                'failure_skips':fail_skipped,'exhausted':False}
+                    if verdict is None:
+                        return {'program':None,'checks':checks,'type_pruned':type_pruned,
+                                'failure_skips':fail_skipped,'exhausted':True}
     return {'program':None,'checks':checks,'type_pruned':type_pruned,'failure_skips':fail_skipped,'exhausted':False}
