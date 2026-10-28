@@ -41,6 +41,13 @@ def value_type(x):
         return listof(resolve(t,s))
     raise TypeError("unsupported observation")
 
+def strict_equal(a,b):
+    """Structural equality that does not confuse bool with int (True == 1)."""
+    if type(a) is not type(b):return False
+    if isinstance(a,(tuple,list)):
+        return len(a)==len(b) and all(strict_equal(x,y) for x,y in zip(a,b))
+    return a==b
+
 def evaluate(body,args):
     tag=body[0]
     if tag=="arg":return args[body[1]]
@@ -75,7 +82,7 @@ class Registry:
             s={}
             for v,t in zip(inputs,arg_types):s=unify(resolve(t,s),value_type(v),s)
             unify(resolve(out_type,s),value_type(expected),s)
-            if evaluate(body,inputs)!=expected:return False
+            if not strict_equal(evaluate(body,inputs),expected):return False
         evidence=json.dumps({"train":len(training),"validation":len(validation)})
         self.db.execute("INSERT INTO operators VALUES(?,?,?,?,?,1)",(name,json.dumps(body),json.dumps(arg_types),json.dumps(out_type),evidence))
         self.db.commit()
