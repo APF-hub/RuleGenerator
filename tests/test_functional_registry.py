@@ -22,6 +22,14 @@ class FunctionalRegistryTests(unittest.TestCase):
                 [([0.4,2.0],0.4*math.sin(1.0))],
                 [([0.8,5.0],0.8*math.sin(2.5))])
             self.assertEqual(evidence["validation_count"],1)
+            self.assertEqual(registry.evidence_ledger.count("validation"),1)
+            self.assertEqual(registry.evidence_ledger.count("type_proof"),0)
+            record=registry.db.execute(
+                "SELECT scope,payload FROM rg_evidence WHERE kind='validation'"
+            ).fetchone()
+            self.assertEqual(record[0],"functional:math")
+            import json
+            self.assertFalse(json.loads(record[1])["proof"])
         with FunctionalRegistry(self.path) as registry:
             self.assertIn("wave",registry.active())
             actual=registry.core().execute(call("wave",lit(0.3),lit(6.0)))
@@ -35,6 +43,7 @@ class FunctionalRegistryTests(unittest.TestCase):
                     [([0.4,2.0],0.4*math.sin(1))],
                     [([0.4,2.0],0.4*math.sin(1))])
             self.assertFalse(registry.active())
+            self.assertEqual(registry.evidence_ledger.count("validation"),0)
     def test_reject_wrong_validation(self):
         with FunctionalRegistry(self.path) as registry:
             with self.assertRaises(ValueError):
@@ -42,5 +51,6 @@ class FunctionalRegistryTests(unittest.TestCase):
                     [([0.4,2.0],0.4*math.sin(1))],
                     [([0.8,5.0],99.0)])
             self.assertFalse(registry.active())
+            self.assertEqual(registry.evidence_ledger.count("validation"),0)
 
 if __name__=="__main__":unittest.main()
