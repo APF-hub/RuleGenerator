@@ -32,7 +32,7 @@ def lift_body(expr):
     raise TypeError('invalid program AST')
 
 
-def discover(registry, name, training, validation, max_nodes=5, budget=10000):
+def discover(registry, name, training, validation, max_nodes=5, budget=10000, max_generated=10000):
     """Discover from training only, validate on separate observations.
 
     Polymorphism is admitted only when the executable body itself typechecks
@@ -43,7 +43,7 @@ def discover(registry, name, training, validation, max_nodes=5, budget=10000):
     from .engine import hash_of
     if {hash_of(x) for x,_ in training} & {hash_of(x) for x,_ in validation}:
         raise ValueError("train/validation input overlap")
-    result=synthesize(registry,training,max_nodes=max_nodes,budget=budget,reuse=True)
+    result=synthesize(registry,training,max_nodes=max_nodes,budget=budget,reuse=True,max_generated=max_generated)
     expr=result['program']
     if expr is None:return dict(result,admitted=False,reason='no training solution')
     generalized_input=generalize_shape(typ(training[0][0]))
