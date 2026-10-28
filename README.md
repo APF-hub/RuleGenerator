@@ -114,3 +114,24 @@ Reproduce with `PYTHONPATH=. python benchmarks/real_trials.py`. On the local fou
 Added a type-soundness regression: an identity body cannot be admitted as `a -> b`. Fixed zero-budget session cursor reporting. Added SQLite context management and fallback finalizers. **Local 18/18 tests passed with ResourceWarnings treated as errors**. Remote GitHub CI remains unverified.
 
 Next: independent held-out multi-task suites, common evidence schema, sound nogoods, and efficient resumable frontiers.
+
+
+## M68: Verified type nogoods, versioned evidence, longitudinal benchmark
+
+New canonical modules:
+- `rulegen/evidence.py`: versioned SQLite evidence ledger (`rg_metadata`, `rg_evidence`) attached to each `Registry`. Evidence kinds: `type_proof`, `empirical_failure`, `validation`, `search_trial`.
+- `tests/test_m68.py`: five tests for proof rechecking, context isolation, persistence, empirical/proof separation, and schema compatibility.
+- `benchmarks/longitudinal.py`: cold versus warm-library evaluation over three held-out swap tasks; acquisition and marginal reuse are reported separately.
+
+**Soundness rule:** only a fresh, independent typecheck that demonstrates a contradiction may prune based on a recorded `type_proof`. Empirical observation mismatches are stored but cannot be promoted into global logical nogoods. A proof's context includes input type, required type, and active operator definitions. This is a first, deliberately narrow proof mechanism, not the full M58 CSP solver.
+
+**Verification boundary:** the M68 files were committed to GitHub, but this session has not independently executed the GitHub checkout or verified its Actions workflow. Do not infer green CI from successful GitHub commits. The new longitudinal benchmark has been added but no results are claimed until executed. Previous locally verified milestone: M67, 18/18 tests.
+
+Run:
+```bash
+python -m pip install -e .
+python -m unittest discover -s tests -v
+PYTHONPATH=. python benchmarks/longitudinal.py
+```
+
+Outstanding: full unified schema migration for older tables, serializable search frontier, actual longitudinal results with diverse negative controls, remote CI verification.
