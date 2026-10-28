@@ -86,12 +86,17 @@ class SineAdapter:
                 if all(abs(peak[0]-p[0]) > 3 for p in program):
                     yield program + (peak,)
 
-def reconstruct_wav(source, destination, *, budget=300, components=3):
+def reconstruct_wav(source, destination, *, budget=300, components=3, database=None):
     from .reconstruct import search
     rate, samples = load_wav(source)
     adapter = SineAdapter(rate, components=components)
     result = search(samples, adapter, budget=budget)
     save_wav(destination, rate, adapter.execute(result.program, samples))
-    return {'program':result.program, 'mse':result.loss,
+    experiment_id = None
+    if database is not None:
+        from .experiments import ExperimentStore
+        with ExperimentStore(database) as store:
+            experiment_id = store.record('audio.sine.v1', [rate, samples], result, budget)
+    return {'experiment_id':experiment_id, 'program':result.program, 'mse':result.loss,
             'evaluations':result.evaluations, 'history':result.history,
             'rate':rate, 'samples':len(samples)}
