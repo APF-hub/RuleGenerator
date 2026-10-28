@@ -40,13 +40,18 @@ def run_learning_cycle(registry, name, training, validation, reuse_rows, *,
         return {"schema_version":1,"admitted":False,"reason":acquisition.get("reason"),
                 "acquisition_checks":acquisition["checks"],"cold":cold,
                 "warm":None,"warm_checks_including_acquisition":None,
-                "validation_execution_count":0}
+                "validation_execution_count":acquisition["validation_executions"],
+                "acquisition_work_units":acquisition["checks"]+acquisition["validation_executions"],
+                "work_unit_definition":"candidate_checks_plus_admission_executions"}
     warm=synthesize(registry,reuse_rows,max_nodes=max_nodes,budget=reuse_budget,
                     reuse=True,max_generated=max_generated)
     return {"schema_version":1,"admitted":True,"operator":name,
             "acquisition_checks":acquisition["checks"],"cold":cold,"warm":warm,
             "warm_checks_including_acquisition":acquisition["checks"]+warm["checks"],
-            "validation_execution_count":len(training)+len(validation),
+            "validation_execution_count":acquisition["validation_executions"],
+            "acquisition_work_units":acquisition["checks"]+acquisition["validation_executions"],
+            "warm_work_units_including_acquisition":acquisition["checks"]+acquisition["validation_executions"]+warm["checks"],
+            "work_unit_definition":"candidate_checks_plus_admission_executions",
             "matched_evaluation_budget":True,"matched_total_budget":False}
 
 
