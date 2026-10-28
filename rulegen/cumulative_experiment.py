@@ -4,7 +4,9 @@ Counts are heterogeneous candidate checks and operator admission executions,
 not elapsed time or equivalent compute. No claim of independent source attestation.
 """
 from .discovery import discover
-from .engine import hash_of, synthesize
+from .engine import Registry, hash_of, synthesize
+from pathlib import Path
+import tempfile
 
 
 def run_reuse_experiment(registry, name, training, validation, targets, *,
@@ -28,8 +30,15 @@ def run_reuse_experiment(registry, name, training, validation, targets, *,
         if seen & keys:raise ValueError("cross-task or split input overlap")
         seen.update(keys)
     # Perform all cold controls before operator promotion.
-    cold=[synthesize(registry,rows,max_nodes=max_nodes,budget=target_budget,
-                     max_generated=max_generated,reuse=False) for rows in targets]
+    # Isolate cold-search failure caches: warm searches must not inherit
+    # negative candidate evidence produced by the cold control.
+    cold=[]
+    for rows in targets:
+        with tempfile.TemporaryDirectory() as directory:
+            with Registry(Path(directory)/'cold.sqlite') as baseline_registry:
+                cold.append(synthesize(baseline_registry,rows,max_nodes=max_nodes,
+                                       budget=target_budget,max_generated=max_generated,
+                                       reuse=False))
     acquisition=discover(registry,name,training,validation,
                          max_nodes=max_nodes,budget=acquisition_budget,
                          max_generated=max_generated)
@@ -48,11 +57,13 @@ def run_reuse_experiment(registry, name, training, validation, targets, *,
     cumulative_warm=acquisition_units
     history=[]
     break_even=None
+    all_preceding_solved=True
     for index,(baseline,learned) in enumerate(zip(cold,warm),start=1):
         cumulative_cold+=baseline["checks"]
         cumulative_warm+=learned["checks"]
         comparable=all(x["program"] is not None for x in (baseline,learned))
-        if comparable and cumulative_warm<=cumulative_cold and break_even is None:
+        all_preceding_solved=all_preceding_solved and comparable
+        if all_preceding_solved and cumulative_warm<=cumulative_cold and break_even is None:
             break_even=index
         history.append({"target":index,"cold_checks":baseline["checks"],
                         "warm_checks":learned["checks"],
