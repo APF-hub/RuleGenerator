@@ -40,8 +40,9 @@ def discover(registry, name, training, validation, max_nodes=5, budget=10000):
     given to the synthesizer. The constructor structure remains an inductive bias.
     """
     if not training or not validation:raise ValueError('nonempty disjoint splits required')
-    if set(map(repr,training)) & set(map(repr,validation)):
-        raise ValueError('train/validation overlap')
+    from .engine import hash_of
+    if {hash_of(x) for x,_ in training} & {hash_of(x) for x,_ in validation}:
+        raise ValueError("train/validation input overlap")
     result=synthesize(registry,training,max_nodes=max_nodes,budget=budget,reuse=True)
     expr=result['program']
     if expr is None:return dict(result,admitted=False,reason='no training solution')
