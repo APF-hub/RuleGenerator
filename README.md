@@ -135,3 +135,21 @@ PYTHONPATH=. python benchmarks/longitudinal.py
 ```
 
 Outstanding: full unified schema migration for older tables, serializable search frontier, actual longitudinal results with diverse negative controls, remote CI verification.
+
+
+### M68 executed results (2026-10-28)
+
+The local M68 test suite ran with `python -W error::ResourceWarning -m unittest discover -s tests -v`: **23 passed, 0 failed** in 0.626 s.
+
+The actual longitudinal benchmark `PYTHONPATH=. python benchmarks/longitudinal.py` was executed. Reproducible output is committed in `benchmarks/m68_results.json`:
+
+| Metric | Primitive-only (cold) | Learned swap (warm) |
+| --- | ---: | ---: |
+| Three task candidate checks | 25 | 3 |
+| Held-out validation passes | 1/3 | 3/3 |
+| Initial operator acquisition checks | — | 17 |
+| Total checks including acquisition | 25 | 20 |
+
+The learned swap operator was admitted after 17 candidate checks. All three subsequent tasks were solved with one candidate evaluation each. The cold search overfit two of the three training sets; this is why validation passes differ.
+
+**Limitations:** three closely related swap tasks, one deterministic split per task, small search space, no wall-clock or memory measurements. This establishes a reproducible positive transfer example, not general cumulative-learning superiority. GitHub workflow status was queried for commit `085af51a`, but the connector returned no pull-request-triggered runs; **remote CI is still unverified**.
