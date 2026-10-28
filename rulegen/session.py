@@ -31,12 +31,14 @@ def synthesize_resumable(registry, rows, *, max_nodes=5, budget=100, reuse=True)
                 'total_checks':prior_checks, 'cursor':cursor, 'done':True, 'resumed':True}
     stream, stats = enumerate_goal(typ(rows[0][1]),typ(rows[0][0]),ops,max_nodes)
     checks=0
+    last_cursor=cursor
     for index, expression in enumerate(stream):
         if index < cursor:
             continue
         if checks >= budget:
             break
         checks+=1
+        last_cursor=index+1
         try:
             matched=all(execute(expression,x,ops)==y for x,y in rows)
         except (ValueError,TypeError,IndexError,RecursionError,OverflowError):
@@ -53,6 +55,6 @@ def synthesize_resumable(registry, rows, *, max_nodes=5, budget=100, reuse=True)
         with registry.db:
             registry.db.execute('UPDATE search_sessions SET completed=1 WHERE id=?',(identity,))
         return {'program':None,'checks':checks,'total_checks':prior_checks+checks,
-                'cursor':cursor+checks,'done':True,'resumed':cursor>0}
+                'cursor':last_cursor,'done':True,'resumed':cursor>0}
     return {'program':None,'checks':checks,'total_checks':prior_checks+checks,
-            'cursor':cursor+checks,'done':False,'resumed':cursor>0}
+            'cursor':last_cursor,'done':False,'resumed':cursor>0}
