@@ -1,5 +1,5 @@
 import tempfile,unittest
-from m60 import Registry
+from m60 import Registry, strict_equal
 from m61_discovery import discover,benchmark
 
 class M61DiscoveryTests(unittest.TestCase):
@@ -17,6 +17,10 @@ class M61DiscoveryTests(unittest.TestCase):
                 [((1,True),(True,1))],
                 [((2,False),(2,False))])
             self.assertFalse(result["admitted"])
+    def test_type_sensitive_observation_equality(self):
+        self.assertFalse(strict_equal((1, True), (True, 1)))
+        self.assertFalse(strict_equal([1, True], [True, 1]))
+        self.assertTrue(strict_equal((1, True), (1, True)))
     def test_training_validation_overlap(self):
         with tempfile.TemporaryDirectory() as d:
             registry=Registry(d+"/db")
