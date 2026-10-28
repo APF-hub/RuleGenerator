@@ -7,6 +7,7 @@ import hashlib
 import json
 import sqlite3
 from .functional import Core, TIERS
+from .evidence import Evidence
 
 def _json(value):
     return json.dumps(value,sort_keys=True,separators=(",",":"),allow_nan=False)
@@ -22,6 +23,7 @@ class FunctionalRegistry:
         self.db.execute("""CREATE TABLE IF NOT EXISTS functional_operators (
             name TEXT PRIMARY KEY, definition TEXT NOT NULL,
             evidence TEXT NOT NULL, status TEXT NOT NULL)""")
+        self.evidence_ledger=Evidence(self.db)
         self.db.commit()
 
     def close(self):
@@ -88,7 +90,10 @@ class FunctionalRegistry:
                   "tolerance":tolerance,"tier":self.tier}
         self.db.execute("INSERT INTO functional_operators VALUES (?,?,?,?)",
                         (name,_json(definition),_json(evidence),"active"))
-        self.db.commit()
+        self.evidence_ledger.append("validation", "functional:"+self.tier,
+                                    {"name":name,"definition_digest":_digest(definition)},
+                                    {"schema":1,"result":"promoted","evidence":evidence,
+                                     "provenance":"unverified","proof":False})
         return evidence
 
     def retire(self,name):
