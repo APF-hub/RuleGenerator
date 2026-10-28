@@ -88,12 +88,15 @@ class FunctionalRegistry:
         evidence={"training_count":len(training),"validation_count":len(validation),
                   "training_digest":_digest(training),"validation_digest":_digest(validation),
                   "tolerance":tolerance,"tier":self.tier}
-        self.db.execute("INSERT INTO functional_operators VALUES (?,?,?,?)",
-                        (name,_json(definition),_json(evidence),"active"))
-        self.evidence_ledger.append("validation", "functional:"+self.tier,
-                                    {"name":name,"definition_digest":_digest(definition)},
-                                    {"schema":1,"result":"promoted","evidence":evidence,
-                                     "provenance":"unverified","proof":False})
+        # One transaction: never expose an active operator without its evidence.
+        with self.db:
+            self.db.execute("INSERT INTO functional_operators VALUES (?,?,?,?)",
+                            (name,_json(definition),_json(evidence),"active"))
+            self.evidence_ledger.append_in_transaction(
+                "validation", "functional:"+self.tier,
+                {"name":name,"definition_digest":_digest(definition)},
+                {"schema":1,"result":"promoted","evidence":evidence,
+                 "provenance":"unverified","proof":False})
         return evidence
 
     def retire(self,name):
