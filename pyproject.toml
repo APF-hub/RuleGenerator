@@ -1,0 +1,11 @@
+[build-system]
+requires = ["setuptools>=68"]
+build-backend = "setuptools.build_meta"
+[project]
+name = "rulegenerator"
+version = "0.64.0"
+requires-python = ">=3.11"
+description = "Research prototypes for typed rule discovery"
+[tool.setuptools]
+packages = ["rulegen"]
+py-modules = ["m58","m60","m61_discovery","m62_portfolio"]
