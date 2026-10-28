@@ -38,13 +38,23 @@ class Evidence:
                         (str(SCHEMA_VERSION),))
         self.db.commit()
 
-    def append(self,kind,scope,candidate,payload):
+    def append_in_transaction(self,kind,scope,candidate,payload):
+        """Insert without committing; caller owns the surrounding transaction."""
         if kind not in ('type_proof','empirical_failure','validation','search_trial'):
             raise ValueError('unknown evidence kind')
+        if not self.db.in_transaction:
+            raise RuntimeError('evidence insert requires an active transaction')
+        self.db.execute(
+            'INSERT INTO rg_evidence(kind,scope,candidate,payload) VALUES(?,?,?,?)',
+            (kind,scope,canonical(candidate),canonical(payload)))
+
+    def append(self,kind,scope,candidate,payload):
+        """Append a standalone event atomically, retaining the original API."""
+        if self.db.in_transaction:
+            raise RuntimeError("use append_in_transaction inside an existing transaction")
         with self.db:
-            self.db.execute(
-                'INSERT INTO rg_evidence(kind,scope,candidate,payload) VALUES(?,?,?,?)',
-                (kind,scope,canonical(candidate),canonical(payload)))
+            self.db.execute("BEGIN")
+            self.append_in_transaction(kind,scope,candidate,payload)
 
     def prove_type_impossible(self, expression, input_type, required_type,
                               operators=None):
