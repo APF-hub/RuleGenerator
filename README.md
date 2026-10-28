@@ -153,3 +153,24 @@ The actual longitudinal benchmark `PYTHONPATH=. python benchmarks/longitudinal.p
 The learned swap operator was admitted after 17 candidate checks. All three subsequent tasks were solved with one candidate evaluation each. The cold search overfit two of the three training sets; this is why validation passes differ.
 
 **Limitations:** three closely related swap tasks, one deterministic split per task, small search space, no wall-clock or memory measurements. This establishes a reproducible positive transfer example, not general cumulative-learning superiority. GitHub workflow status was queried for commit `085af51a`, but the connector returned no pull-request-triggered runs; **remote CI is still unverified**.
+
+
+## M69: Matched-budget transfer evaluation (2026-10-28)
+
+Added `rulegen/evaluation.py`, `tests/test_m69.py` and `benchmarks/m69_summary.json`. Run `python -W error::ResourceWarning -m unittest discover -s tests -v` and `python -m rulegen.evaluation` (or `from rulegen.evaluation import evaluate; evaluate(budget=40,depth=5,seeds=(0,1,2))`).
+
+**Local execution:** 26/26 regression tests passed. Nine tasks (three swap-related, six unrelated controls) repeated in three seeded orders. Equal per-task maximum of 40 candidate evaluations:
+
+| Metric | Cold | Warm |
+| --- | ---: | ---: |
+| Task trials | 27 | 27 |
+| Held-out validations | 21 | 27 |
+| Candidate checks | 300 | 147 |
+| Acquisition checks | 0 | 51 |
+| Checks including acquisition | 300 | 198 |
+| Related validations | 6/9 | 9/9 |
+| Unrelated validations | 15/18 | 18/18 |
+
+The 51% marginal check reduction and 34% including acquisition are **specific to this fixed task suite**. Shuffling order does not provide independent statistical replications. Cold and warm each use fresh databases per task; the learned operator is copied from a separately validated acquisition. Timing is instrumentation-dependent and does not include setup/acquisition. Search enumeration and typechecking cost are not counted as candidate evaluations. Remote GitHub CI remains unverified.
+
+**Next:** independent task generation, more diverse task families, negative transfer stress with many irrelevant operators, per-run peak RSS and search-generation cost, fixed *total* computational budgets, and statistical uncertainty intervals.
