@@ -4,6 +4,7 @@ import subprocess
 import sys
 
 from .process_isolation import IsolatedExecutionError
+from .bounded_subprocess import run_bounded
 
 
 def synthesize_functional_isolated(rows, *, tier="math", budget=2000,
@@ -39,24 +40,11 @@ def synthesize_functional_isolated(rows, *, tier="math", budget=2000,
     payload=json.dumps(request,allow_nan=False).encode()
     if len(payload)>1048576:
         raise ValueError("request too large")
-    def limit_memory():
-        import resource
-        resource.setrlimit(resource.RLIMIT_AS,(memory_bytes,memory_bytes))
+    output=run_bounded([sys.executable,"-m","rulegen.synthesis_worker"],
+                       payload,timeout_seconds=timeout_seconds,
+                       memory_bytes=memory_bytes)
     try:
-        completed=subprocess.run([sys.executable,"-m","rulegen.synthesis_worker"],
-            input=payload,stdout=subprocess.PIPE,stderr=subprocess.PIPE,
-            timeout=timeout_seconds,check=False,
-            preexec_fn=limit_memory if memory_bytes is not None else None)
-    except subprocess.TimeoutExpired as exc:
-        raise IsolatedExecutionError("isolated synthesis timeout") from exc
-    except OSError as exc:
-        raise IsolatedExecutionError("failed to launch synthesis worker") from exc
-    if completed.returncode!=0:
-        raise IsolatedExecutionError("synthesis worker failed (exit "+str(completed.returncode)+")")
-    if len(completed.stdout)>1048576:
-        raise IsolatedExecutionError("worker response too large")
-    try:
-        result=json.loads(completed.stdout)
+        result=json.loads(output)
     except (ValueError,UnicodeError) as exc:
         raise IsolatedExecutionError("invalid worker response") from exc
     if not isinstance(result,dict) or type(result.get("checks")) is not int or not 0<=result["checks"]<=budget:
