@@ -2,7 +2,7 @@
 Searches executable bodies from observations, then validates a polymorphic type.
 """
 from itertools import product
-from m60 import Registry, var, pair, value_type, infer, evaluate, unify
+from m60 import Registry, var, pair, value_type, infer, evaluate, unify, strict_equal
 
 def shape(t, counter=None):
     counter = [0] if counter is None else counter
@@ -36,7 +36,7 @@ def discover(registry, name, training, validation, max_nodes=5):
                 pruned+=1;continue
             checks+=1
             try:
-                if not all(evaluate(body,[x])==y for x,y in training):continue
+                if not all(strict_equal(evaluate(body,[x]),y) for x,y in training):continue
                 accepted=registry.admit(name,body,[input_type],output_type,
                     [([x],y) for x,y in training],
                     [([x],y) for x,y in validation])
