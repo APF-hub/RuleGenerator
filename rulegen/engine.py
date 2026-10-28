@@ -139,6 +139,11 @@ class Registry:
         self.db.commit()
     def close(self):
         self.db.close()
+    def __del__(self):
+        db=getattr(self, "db", None)
+        if db is not None:
+            try: db.close()
+            except sqlite3.Error: pass
     def __enter__(self):
         return self
     def __exit__(self, exc_type, exc, tb):
