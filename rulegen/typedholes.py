@@ -82,4 +82,5 @@ def synthesize_goal(registry,rows,max_nodes=5,budget=10000,reuse=True):
         except (ValueError,TypeError,IndexError,RecursionError,OverflowError):good=False
         if good:return {'program':e,'checks':checks,'failure_skips':skips,'exhausted':False,'stats':stats}
         registry.record_failure(scope,e,'empirical mismatch: scope only')
+        registry.evidence.append('empirical_failure',scope,e,{'reason':'observation mismatch','schema':1})
     return {'program':None,'checks':checks,'failure_skips':skips,'exhausted':False,'stats':stats}
