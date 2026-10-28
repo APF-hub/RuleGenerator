@@ -33,6 +33,7 @@ def run_bounded(argv, payload, *, timeout_seconds, memory_bytes=None,
         except ProcessLookupError:pass
     sel=selectors.DefaultSelector()
     output=bytearray()
+    total_output=0
     try:
         # Nonblocking input avoids deadlock when a child does not read stdin.
         os.set_blocking(proc.stdin.fileno(),False)
@@ -56,12 +57,13 @@ def run_bounded(argv, payload, *, timeout_seconds, memory_bytes=None,
                         sel.unregister(proc.stdin)
                         proc.stdin.close()
                     continue
-                chunk=os.read(key.fileobj.fileno(),min(65536,max_output_bytes+1-len(output)))
+                chunk=os.read(key.fileobj.fileno(),min(65536,max_output_bytes+1-total_output))
                 if not chunk:
                     sel.unregister(key.fileobj)
                     continue
-                output.extend(chunk)
-                if len(output)>max_output_bytes:
+                total_output+=len(chunk)
+                if key.fileobj is proc.stdout:output.extend(chunk)
+                if total_output>max_output_bytes:
                     raise IsolatedExecutionError("worker output limit exceeded")
         remaining=deadline-time.monotonic()
         if remaining<=0:
