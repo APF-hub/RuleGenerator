@@ -187,13 +187,18 @@ class Registry:
     def failed(self,scope,expr):
         return self.db.execute('SELECT 1 FROM failures WHERE scope=? AND candidate=?',(scope,encode(expr))).fetchone() is not None
 
-def synthesize(registry,rows,max_nodes=4,budget=10000,reuse=True):
+def synthesize(registry,rows,max_nodes=4,budget=10000,reuse=True,max_generated=10000):
     """Enumerate typed expressions, pruning invalid types before execution."""
     if not rows:raise ValueError('empty observations')
+    if any(type(n) is not int or n<1 for n in (max_nodes,budget,max_generated)):
+        raise ValueError('positive integer limits required')
     ti=typ(rows[0][0]);to=typ(rows[0][1]);scope=hash_of(rows)
     ops=registry.active() if reuse else {}
     pool={1:[['input']]+[['const',v] for v in (0,1,True,False)]}
     seen=set();checks=0;type_pruned=0;fail_skipped=0
+    generated=len(pool[1])
+    if generated>max_generated:
+        return {'program':None,'checks':0,'type_pruned':0,'failure_skips':0,'exhausted':True}
     for n in range(1,max_nodes+1):
         if n>1:
             pool[n]=[]
@@ -205,7 +210,10 @@ def synthesize(registry,rows,max_nodes=4,budget=10000,reuse=True):
                         expr=['call',name,*args]
                         try:typecheck(expr,ti,ops)
                         except TypeError:type_pruned+=1;continue
+                        if generated>=max_generated:
+                            return {'program':None,'checks':checks,'type_pruned':type_pruned,'failure_skips':fail_skipped,'exhausted':True}
                         pool[n].append(expr)
+                        generated+=1
         for expr in pool[n]:
             signature=encode(expr)
             if signature in seen:continue
