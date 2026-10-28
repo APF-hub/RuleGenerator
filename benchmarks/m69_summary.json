@@ -1,0 +1,42 @@
+{
+  "config": {
+    "budget_per_task": 40,
+    "depth": 5,
+    "seeds": [
+      0,
+      1,
+      2
+    ],
+    "tasks_per_seed": 9,
+    "matched_per_task_budget": true
+  },
+  "acquisition_checks_per_seed": 17,
+  "total_acquisition_checks": 51,
+  "summary": {
+    "cold": {
+      "tasks": 27,
+      "validated": 21,
+      "checks": 300,
+      "wall_seconds": 0.348787172998982,
+      "related_validated": 6,
+      "unrelated_validated": 15
+    },
+    "warm": {
+      "tasks": 27,
+      "validated": 27,
+      "checks": 147,
+      "wall_seconds": 0.08428016299990304,
+      "related_validated": 9,
+      "unrelated_validated": 18
+    }
+  },
+  "warm_checks_including_acquisition": 198,
+  "peak_python_traced_bytes": 494574,
+  "provenance": "Local execution of M69 evaluation on 2026-10-28; three shuffled repeats of nine fixed tasks; not independent samples",
+  "caveats": [
+    "Only nine fixed tasks, with repeated shuffled order",
+    "Candidate evaluations exclude enumeration/typechecking cost",
+    "Wall-clock includes only synthesis call, excludes acquisition and setup",
+    "Tracemalloc Python peak is not process RSS"
+  ]
+}
