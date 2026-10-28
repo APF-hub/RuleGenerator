@@ -50,7 +50,10 @@ class Evidence:
 
     def append(self,kind,scope,candidate,payload):
         """Append a standalone event atomically, retaining the original API."""
+        if self.db.in_transaction:
+            raise RuntimeError("use append_in_transaction inside an existing transaction")
         with self.db:
+            self.db.execute("BEGIN")
             self.append_in_transaction(kind,scope,candidate,payload)
 
     def prove_type_impossible(self, expression, input_type, required_type,
