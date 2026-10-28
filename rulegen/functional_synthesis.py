@@ -49,6 +49,9 @@ def synthesize_functional(rows,registry=None,*,tier="math",max_nodes=7,
     pool={1:[variable(k) for k in sorted(env_type)]+[literal(v) for v in constants]}
     seen=set()
     generated=len(pool[1])
+    if generated>max_generated:
+        return {"program":None,"checks":0,"type_pruned":0,
+                "runtime_errors":0,"exhausted":True}
     checks=0;type_pruned=0;runtime_errors=0
     for size in range(1,max_nodes+1):
         if size>1:
