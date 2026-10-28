@@ -166,7 +166,7 @@ class Registry:
     def active(self):
         return {n:{'body':json.loads(b),'args':json.loads(a),'out':json.loads(o)}
                 for n,b,a,o in self.db.execute("SELECT name,body,args,output FROM operators WHERE status='active'")}
-    def admit(self,name,body,arg_types,out_type,training,validation):
+    def admit(self,name,body,arg_types,out_type,training,validation,*,execution_counter=None):
         if not training or not validation:raise ValueError('independent evidence required')
         if name in PRIMS or name in self.active():raise ValueError('duplicate operator name')
         # Type variables in the output must be constrained by inputs, or be
@@ -182,6 +182,8 @@ class Registry:
             s={}
             for val,t in zip(inputs,arg_types):s=unify(substitute(t,s),typ(val),s)
             unify(substitute(out_type,s),typ(expected),s)
+            if execution_counter is not None:
+                execution_counter["attempted"]+=1
             if execute(body,tuple(inputs),self.active())!=expected:return False
         evidence={'train':len(training),'validation':len(validation),'digest':hash_of([training,validation])}
         self.db.execute('INSERT INTO operators VALUES(?,?,?,?,?,?)',
