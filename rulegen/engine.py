@@ -196,7 +196,7 @@ class Registry:
     def failed(self,scope,expr):
         return self.db.execute('SELECT 1 FROM failures WHERE scope=? AND candidate=?',(scope,encode(expr))).fetchone() is not None
 
-def synthesize(registry,rows,max_nodes=4,budget=10000,reuse=True,max_generated=10000,cancel=None,timeout_seconds=None):
+def synthesize(registry,rows,max_nodes=4,budget=10000,reuse=True,max_generated=10000,cancel=None,timeout_seconds=None,operator_priority=None):
     """Enumerate typed expressions, pruning invalid types before execution."""
     if not rows:raise ValueError('empty observations')
     if any(type(n) is not int or n<1 for n in (max_nodes,budget,max_generated)):
@@ -230,6 +230,10 @@ def synthesize(registry,rows,max_nodes=4,budget=10000,reuse=True,max_generated=1
         registry.record_failure(scope,expr,'observational_mismatch')
         return False
 
+    operator_names=list(PRIMS)+list(ops)
+    if operator_priority is not None:
+        priority={name:index for index,name in enumerate(operator_priority)}
+        operator_names.sort(key=lambda name:(priority.get(name,len(priority)),name))
     for n in range(1,max_nodes+1):
         check_cancel(cancel,deadline)
         if n==1:
@@ -250,7 +254,7 @@ def synthesize(registry,rows,max_nodes=4,budget=10000,reuse=True,max_generated=1
                     return {'program':None,'checks':checks,'type_pruned':type_pruned,
                             'failure_skips':fail_skipped,'exhausted':True}
             continue
-        for name in list(PRIMS)+list(ops):
+        for name in operator_names:
             arity=len(PRIMS[name][0]) if name in PRIMS else len(ops[name]['args'])
             for sizes in itertools.product(range(1,n),repeat=arity):
                 if sum(sizes)!=n-1:continue
