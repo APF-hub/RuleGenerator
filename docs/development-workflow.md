@@ -6,7 +6,7 @@ requests. Do not commit directly to `main`.
 1. Create a branch from `main` for each bounded change.
 2. Commit implementation and capability regression tests together.
 3. Open a pull request targeting `main`.
-4. Wait for the Python 3.11 and 3.12 capability jobs to finish.
+4. Wait for the Python 3.12 capability job to finish.
 5. On failure, retrieve the failed workflow job logs, reproduce where possible,
    repair on the same branch, and repeat until checks pass.
 6. Merge only after required checks pass. Report the exact CI run and commit.
@@ -15,7 +15,7 @@ requests. Do not commit directly to `main`.
 
 Repository administrator: enable branch protection or a ruleset for `main`,
 require a pull request, and select the exact required check names shown by the
-Actions matrix. GitHub permissions and repository rules may require manual
+Actions workflow. GitHub permissions and repository rules may require manual
 administrator setup.
 
 ## Existing baseline
@@ -30,3 +30,11 @@ baseline failures separately and track them as evidence.
 A discovered operator must remain a candidate until independent validation
 and evidence-based promotion. Manually registered operator definitions and
 reference audio primitives must not be counted as discoveries.
+
+## Change classification
+
+Every PR must identify its primary track: P (platform), C (capability), or E
+(experiment). P/C changes require supported capability regression tests and
+release review; E outcomes belong outside release-gating CI. See
+[engineering charter](engineering-charter.md). Experimental success never
+implicitly authorizes capability promotion.
