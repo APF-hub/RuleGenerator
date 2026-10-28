@@ -26,11 +26,17 @@ class FunctionalRegistry:
         except BaseException:
             self.db.close()
             raise
-        self.db.execute("""CREATE TABLE IF NOT EXISTS functional_operators (
-            name TEXT PRIMARY KEY, definition TEXT NOT NULL,
-            evidence TEXT NOT NULL, status TEXT NOT NULL)""")
-        self.evidence_ledger=Evidence(self.db)
-        self.db.commit()
+        try:
+            self.db.execute("BEGIN IMMEDIATE")
+            self.db.execute("""CREATE TABLE IF NOT EXISTS functional_operators (
+                name TEXT PRIMARY KEY, definition TEXT NOT NULL,
+                evidence TEXT NOT NULL, status TEXT NOT NULL)""")
+            self.evidence_ledger=Evidence(self.db)
+            self.db.commit()
+        except BaseException:
+            self.db.rollback()
+            self.db.close()
+            raise
 
     def close(self):
         self.db.close()
