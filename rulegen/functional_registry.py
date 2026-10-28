@@ -8,6 +8,7 @@ import json
 import sqlite3
 from .functional import Core, TIERS
 from .evidence import Evidence
+from .database_lifecycle import inspect_database
 
 def _json(value):
     return json.dumps(value,sort_keys=True,separators=(",",":"),allow_nan=False)
@@ -20,6 +21,11 @@ class FunctionalRegistry:
         if tier not in TIERS:raise ValueError("unknown tier")
         self.tier=tier
         self.db=sqlite3.connect(str(path))
+        try:
+            inspect_database(self.db)
+        except BaseException:
+            self.db.close()
+            raise
         self.db.execute("""CREATE TABLE IF NOT EXISTS functional_operators (
             name TEXT PRIMARY KEY, definition TEXT NOT NULL,
             evidence TEXT NOT NULL, status TEXT NOT NULL)""")
