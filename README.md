@@ -63,3 +63,19 @@ Next: migrate the full consolidated package to GitHub, enable CI, integrate scop
 The M63 local archive adds `rulegen.typedholes` (top-down type-constraint propagation) and `rulegen.benchmark` (deterministic adaptive/round-robin/random allocation controls). Nine local tests pass. In a deliberately favorable **simulated** 30-trial allocation experiment, adaptive achieved validated gain 45 vs round-robin 30 and random 29, all at cost 60. These are **not** observed real-synthesis improvements.
 
 A Python CI workflow is now in this repository. **Release blocker:** the full canonical package is not yet imported; see issue #1. The standalone GitHub code and the local M63 archive are not yet equivalent. Do not interpret CI on the standalone modules as validation of the local consolidated package.
+
+
+## M64 repository consolidation (2026-10-28)
+
+A pip-installable `rulegen/` package and package-level tests now exist **in GitHub**, alongside the existing M58, M60, M61 and M62 standalone implementations. Run:
+
+```bash
+python -m pip install -e .
+python -m unittest discover -v
+```
+
+Package modules: `engine` (compatibility export of M60 registry/type kernel), `discovery` (M61 discovery), `typedholes` (goal-type-filtered enumeration), `portfolio` (M62 measured allocation), `benchmark` (equal-budget simulated policy replay).
+
+**Integration caveats:** this is a transitional canonical package, not a verbatim import of the M63 local archive. The M63 local archive's nine tests passed independently, but the GitHub package tests have not yet been run by the connected GitHub CI. The M58 scoped nogood engine remains separate and is not used by typed-hole synthesis; the portfolio uses simulated outcomes rather than real synthesis trials; checkpointing and validated admission are not unified. The M60 registry currently permits user-supplied operators and M61 discovery is restricted to pair combinators.
+
+No claim of complete functionality or green remote CI is made until those end-to-end integrations are demonstrated.
