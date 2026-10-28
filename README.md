@@ -79,3 +79,12 @@ Package modules: `engine` (compatibility export of M60 registry/type kernel), `d
 **Integration caveats:** this is a transitional canonical package, not a verbatim import of the M63 local archive. The M63 local archive's nine tests passed independently, but the GitHub package tests have not yet been run by the connected GitHub CI. The M58 scoped nogood engine remains separate and is not used by typed-hole synthesis; the portfolio uses simulated outcomes rather than real synthesis trials; checkpointing and validated admission are not unified. The M60 registry currently permits user-supplied operators and M61 discovery is restricted to pair combinators.
 
 No claim of complete functionality or green remote CI is made until those end-to-end integrations are demonstrated.
+
+
+## M65 canonical source import — VERIFIED (2026-10-28)
+
+The exact M63 Python source files and tests have now been imported into GitHub. Git blob SHA-1 values were compared against local M63 files: **9/9 matched**, including the package initializer, all five implementation modules, two test modules, and pyproject.toml. The incompatible transitional `tests/test_package.py` was removed.
+
+Local source validation: `python -m unittest discover -s tests -v` completed **9/9 passing** before import; warnings about unclosed SQLite connections remain. CI now explicitly tests the canonical package on Python 3.11 and 3.12, plus the legacy standalone tests. **Remote CI status has not yet been confirmed.**
+
+The imported implementation includes scoped empirical mismatch caching, goal-directed typed-hole enumeration, persisted operators and a persistent exploration portfolio. **Still not integrated:** durable mid-search checkpoints, proof-based nogoods from M58, one unified evidence schema, and portfolio rewards driven by real synthesis trials. These remain separate acceptance criteria; exact source parity does not imply all historical functionality is integrated.
