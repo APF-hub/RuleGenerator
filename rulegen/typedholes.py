@@ -85,7 +85,6 @@ def synthesize_goal(registry,rows,max_nodes=5,budget=10000,reuse=True,max_genera
     ti,to=typ(rows[0][0]),typ(rows[0][1]);scope=hash_of(['typedholes-v1',rows])
     ops=registry.active() if reuse else {}
     candidates,stats=enumerate_goal(to,ti,ops,max_nodes,max_generated)
-    checks=skips=0
     try:
         return _evaluate_candidates(candidates,stats,registry,scope,rows,ops,budget)
     except GenerationLimitReached:
@@ -97,9 +96,13 @@ def _evaluate_candidates(candidates,stats,registry,scope,rows,ops,budget):
     for e in candidates:
         stats['checks']=checks
         stats['skips']=skips
-        if registry.failed(scope,e):skips+=1;continue
+        if registry.failed(scope,e):
+            skips+=1
+            stats['skips']=skips
+            continue
         if checks>=budget:return {'program':None,'checks':checks,'failure_skips':skips,'exhausted':True,'stats':stats}
         checks+=1
+        stats['checks']=checks
         try:good=all(execute(e,x,ops)==y for x,y in rows)
         except (ValueError,TypeError,IndexError,RecursionError,OverflowError):good=False
         if good:return {'program':e,'checks':checks,'failure_skips':skips,'exhausted':False,'stats':stats}
