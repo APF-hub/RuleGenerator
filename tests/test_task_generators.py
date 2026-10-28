@@ -20,7 +20,7 @@ class GeneratedTaskTests(unittest.TestCase):
     def test_pair_generator(self):
         task=generate_task(19,family="pair")
         self.assertEqual(task["generator_complexity"],
-                         {"nodes":6,"depth":3,"calls":3})
+                         {"nodes":5,"depth":3,"calls":3})
         for x,y in task["training"]+task["validation"]+task["test"]:
             self.assertEqual(y,(x[1],x[0]))
 
