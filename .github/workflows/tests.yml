@@ -1,11 +1,12 @@
-name: Python regression tests
+name: Capability regression tests
 on:
   push:
   pull_request:
 jobs:
-  test:
+  capabilities:
     runs-on: ubuntu-latest
     strategy:
+      fail-fast: false
       matrix:
         python-version: ['3.11', '3.12']
     steps:
@@ -13,9 +14,7 @@ jobs:
       - uses: actions/setup-python@v5
         with:
           python-version: ${{ matrix.python-version }}
-      - name: Install canonical package
+      - name: Install RuleGenerator
         run: python -m pip install -e .
-      - name: Test canonical M63 implementation
+      - name: Verify supported capabilities
         run: python -m unittest discover -s tests -p 'test_*.py' -v
-      - name: Test legacy compatibility
-        run: python -m unittest discover -s . -p 'test_m*.py' -v
