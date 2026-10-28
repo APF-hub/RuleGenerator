@@ -174,3 +174,22 @@ Added `rulegen/evaluation.py`, `tests/test_m69.py` and `benchmarks/m69_summary.j
 The 51% marginal check reduction and 34% including acquisition are **specific to this fixed task suite**. Shuffling order does not provide independent statistical replications. Cold and warm each use fresh databases per task; the learned operator is copied from a separately validated acquisition. Timing is instrumentation-dependent and does not include setup/acquisition. Search enumeration and typechecking cost are not counted as candidate evaluations. Remote GitHub CI remains unverified.
 
 **Next:** independent task generation, more diverse task families, negative transfer stress with many irrelevant operators, per-run peak RSS and search-generation cost, fixed *total* computational budgets, and statistical uncertainty intervals.
+
+
+## M70–M71: Observation-adapter architecture and persistent reconstruction
+
+The development focus has shifted from one-off negative-transfer tests to a complete observation-driven system capable of learning executable programs. Audio is the first adapter; images and other observation types can follow.
+
+**Canonical committed code:** `rulegen/reconstruct.py` (domain-independent best-so-far hypothesis search), `rulegen/audio.py` (16-bit PCM WAV adapter, additive sinusoidal programs, rendering, MSE loss and refinement), `rulegen/experiments.py` (persistent adapter-scoped reconstruction experiments), `tests/test_m70.py` and `tests/test_m71.py`.
+
+Run:
+```python
+from rulegen.audio import reconstruct_wav
+result = reconstruct_wav('input.wav', 'reconstructed.wav', budget=300,
+                         database='knowledge.sqlite')
+```
+The result includes an `experiment_id`; `ExperimentStore('knowledge.sqlite').best('audio.sine.v1', [rate, samples])` retrieves the best saved reconstruction for that exact observation and adapter.
+
+**Local M70–M71 isolated regression:** 6/6 tests passed with ResourceWarnings treated as errors. The source files are committed and GitHub file blobs verified for reconstruct/audio and both test files; `experiments.py` is functionally identical to the locally tested copy but includes a GitHub-only module docstring. This is **not yet full integrated M63–M71 test verification**; remote GitHub CI is unverified.
+
+**Critical remaining integration:** audio candidate programs currently use a simple oscillator tuple grammar, distinct from the canonical typed AST. The generic controller does not yet promote validated reconstructions into reusable typed operators. Experiment persistence stores candidate results but not discovered rule generalizations. Future work should integrate one typed executable program representation, a modality-neutral observation/evaluation protocol, operator promotion, and residual-driven experiment selection.
