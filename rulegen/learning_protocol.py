@@ -26,9 +26,9 @@ def evaluate_backend(backend,rows,registry,*,budget,max_nodes=5,reuse=True,max_g
     if backend=="legacy":
         result=legacy_synthesize(registry,rows,max_nodes=max_nodes,budget=budget,reuse=reuse,max_generated=max_generated,cancel=cancel)
     elif backend=="legacy-goal":
-        result=synthesize_goal(registry,rows,max_nodes=max_nodes,budget=budget,reuse=reuse)
+        result=synthesize_goal(registry,rows,max_nodes=max_nodes,budget=budget,reuse=reuse,max_generated=max_generated,cancel=cancel)
     elif backend=="functional":
-        result=synthesize_functional(rows,registry,max_nodes=max_nodes,budget=budget,reuse=reuse)
+        result=synthesize_functional(rows,registry,max_nodes=max_nodes,budget=budget,reuse=reuse,max_generated=max_generated,cancel=cancel)
     else:
         raise ValueError("unknown backend")
     if type(result["checks"]) is not int or not 0<=result["checks"]<=budget:
