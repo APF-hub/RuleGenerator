@@ -95,3 +95,22 @@ The imported implementation includes scoped empirical mismatch caching, goal-dir
 Added `rulegen/session.py` and `tests/test_m66.py` directly to the canonical GitHub repository. `synthesize_resumable` stores a transactional cursor and matched program in SQLite; search identity includes observations, depth, reuse flag, primitive type signatures and active learned operator definitions. A restart resumes candidate **evaluation** without rechecking earlier candidates. Rebuilding the enumerator still costs O(previously generated candidates).
 
 **Local regression:** 12/12 tests passed (nine prior, three new). Existing SQLite connection warnings remain. Remote CI not yet verified. This is durable typed-hole search continuation, not M58's proof-based nogood integration or a unified evidence database.
+
+
+## M67: Real synthesis trials and database lifecycle
+
+Added `rulegen/trials.py`, `tests/test_m67.py` and `benchmarks/real_trials.py`. Each allocation choice now triggers a real bounded typed-hole synthesis attempt, with independent held-out validation; only validated solutions count as observed reward. The trial runner records actual candidate executions, program and selected direction. This is **not** a simulation.
+
+Reproduce with `PYTHONPATH=. python benchmarks/real_trials.py`. On the local four-task smoke benchmark (depths 1/3/5, up to 12 checks per task, seed 11):
+
+| Policy | Held-out tasks solved | Candidate executions |
+| --- | ---: | ---: |
+| Adaptive | 2/4 | 20 |
+| Round-robin | 2/4 | 20 |
+| Seeded random | 2/4 | 15 |
+
+**There is no demonstrated adaptive advantage.** Costs are realized rather than equal, and trials use fresh registries to prevent cross-policy leakage. The workload is too small to support general conclusions.
+
+Added a type-soundness regression: an identity body cannot be admitted as `a -> b`. Fixed zero-budget session cursor reporting. Added SQLite context management and fallback finalizers. **Local 18/18 tests passed with ResourceWarnings treated as errors**. Remote GitHub CI remains unverified.
+
+Next: independent held-out multi-task suites, common evidence schema, sound nogoods, and efficient resumable frontiers.
