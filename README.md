@@ -45,3 +45,14 @@ The separate downloadable M61 research archive contains the full local M60 synth
 3. Add continuous integration, benchmark manifests and reproducible environment.
 4. Learn recursive and higher-order abstractions and type constructors without task-specific hints.
 5. Evaluate on diverse held-out programs and raw audio, including negative controls.
+
+
+## M62: Consolidation and research allocation
+
+M62 local archive packages the fuller M60–M61 typed synthesizer as `rulegen.engine` and `rulegen.discovery`, adds `rulegen.portfolio`, a `pyproject.toml`, and four passing local integration tests. **It does not yet integrate all M55–M59 prototypes.** The GitHub repo contains `m62_portfolio.py` as a standalone version of the new scheduling mechanism; the full consolidated package is in the M62 downloadable archive pending source import.
+
+**Decision principle:** A discovered operator's acquisition cost is sunk when deciding marginal reuse. Research allocation tracks historical exploration cost and independently validated outcomes; it never assigns speculative future value to a discovery.
+
+The scheduler reserves every Nth decision for the least-funded research direction; otherwise it favours directions with measured validated improvement per cost, and tries untested directions. This is an auditable heuristic, not an optimal bandit. Held-out comparability and fixed-budget baselines are still needed.
+
+Next: migrate the full consolidated package to GitHub, enable CI, integrate scoped failure learning and typed holes, and run matched-budget longitudinal benchmarks.
