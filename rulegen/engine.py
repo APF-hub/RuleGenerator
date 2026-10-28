@@ -137,6 +137,12 @@ class Registry:
         self.db.execute('''CREATE TABLE IF NOT EXISTS operators(name TEXT PRIMARY KEY, body TEXT, args TEXT, output TEXT, evidence TEXT, status TEXT)''')
         self.db.execute('''CREATE TABLE IF NOT EXISTS failures(scope TEXT, candidate TEXT, reason TEXT, PRIMARY KEY(scope,candidate))''')
         self.db.commit()
+    def close(self):
+        self.db.close()
+    def __enter__(self):
+        return self
+    def __exit__(self, exc_type, exc, tb):
+        self.close()
     def active(self):
         return {n:{'body':json.loads(b),'args':json.loads(a),'out':json.loads(o)}
                 for n,b,a,o in self.db.execute("SELECT name,body,args,output FROM operators WHERE status='active'")}
@@ -146,7 +152,9 @@ class Registry:
         # Type variables in the output must be constrained by inputs, or be
         # justified by a constant-returning implementation.
         inferred=check_body(body,arg_types,self.active())
-        relation=unify(inferred,out_type)
+        # A signature must be justified by the body, not merely unifiable.
+        if encode(inferred) != encode(out_type):
+            raise TypeError('operator signature exceeds inferred parametric type')
         # Reject signatures with unrelated output variables only when
         # the body cannot justify them by its inferred type.
         for inputs,expected in training+validation:
