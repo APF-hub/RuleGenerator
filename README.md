@@ -209,3 +209,17 @@ result = reconstruct_spectrogram_wav('input.wav', 'output.wav',
 **Local verification:** M70–M72 isolated suite 10/10 passing. On the existing two-tone demonstration at 120 candidate evaluations, waveform MSE was **0.0037536868** with waveform-only loss, **0.0037536868** with 50/50 waveform/spectral loss, and **0.0056962050** with spectral-only loss. Thus **no improvement was observed** from joint loss on this small example. The spectral loss was computed from unquantized magnitudes; the grayscale spectrogram is for visualization only. This is a representation-integration milestone, not yet autonomous representation selection or rule discovery.
 
 Next: connect residual spectral ridges and onsets to **generic hypothesis proposals**, introduce typed executable program composition, and let the controller select useful representations based on measured improvement. The M72 tests use NumPy, now declared as a project dependency.
+
+
+## M73: Residual-guided construction of temporal audio programs
+
+Added `rulegen/residual.py`, `tests/test_m73.py` and `benchmarks/m73_results.json`. The generic search controller now receives proposals generated from **unexplained residual energy**. The audio adapter fits candidate oscillators using local spectra and least-squares amplitude/phase, then proposes composable events with start/end sample positions. This can express overlapping tones and successive notes.
+
+```python
+from rulegen.residual import reconstruct_residual_wav
+result = reconstruct_residual_wav('input.wav','reconstructed.wav',
+                                  budget=150,max_events=5,
+                                  database='knowledge.sqlite')
+```
+
+**Local M70–M73 isolated tests:** 13/13 passed with ResourceWarnings treated as errors. **Increasing-complexity synthetic experiments (120 candidate evaluations per method):** single tone and two/three overlapping tones had near-zero MSE under both baseline and residual-guided models; two successive notes improved from baseline MSE **0.0353011** to residual-guided MSE **6.49e-33**. The sequential improvement is attributable to the new event-interval grammar; this is not evidence that the residual proposal policy alone outperforms alternative policies. Frequencies were deliberately FFT-grid-aligned; off-grid frequency, varying note duration, envelopes and real recordings remain untested. Candidate evaluation budgets do not count proposal generation and least-squares computation. Full canonical typed AST and operator promotion remain unintegrated. Remote CI unverified.
