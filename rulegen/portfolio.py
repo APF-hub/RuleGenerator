@@ -22,6 +22,17 @@ class Portfolio:
           CREATE TABLE IF NOT EXISTS state(key TEXT PRIMARY KEY, value INTEGER NOT NULL);
         ''')
         self.db.commit()
+    def close(self):
+        self.db.close()
+    def __del__(self):
+        db=getattr(self, "db", None)
+        if db is not None:
+            try: db.close()
+            except sqlite3.Error: pass
+    def __enter__(self):
+        return self
+    def __exit__(self, exc_type, exc, tb):
+        self.close()
     def register(self, name):
         self.db.execute('INSERT OR IGNORE INTO directions(name) VALUES(?)',(name,))
         self.db.commit()
