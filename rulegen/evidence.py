@@ -20,8 +20,17 @@ class Evidence:
         self.db=connection
         # Individual DDL statements participate in the caller's transaction.
         # executescript() would implicitly commit and break atomic startup.
-        if not self.db.in_transaction:
-            raise RuntimeError("evidence initialization requires an active transaction")
+        owned_transaction=not self.db.in_transaction
+        if owned_transaction:
+            self.db.execute("BEGIN IMMEDIATE")
+        try:
+            self._initialize_schema()
+            if owned_transaction:self.db.commit()
+        except BaseException:
+            if owned_transaction:self.db.rollback()
+            raise
+
+    def _initialize_schema(self):
         self.db.execute("""CREATE TABLE IF NOT EXISTS rg_metadata(
             key TEXT PRIMARY KEY, value TEXT NOT NULL)""")
         self.db.execute("""CREATE TABLE IF NOT EXISTS rg_evidence(
