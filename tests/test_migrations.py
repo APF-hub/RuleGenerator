@@ -27,6 +27,7 @@ class MigrationTests(unittest.TestCase):
             # An unsupported evidence version must fail without migration side effects.
             db.execute("CREATE TABLE rg_metadata(key TEXT PRIMARY KEY,value TEXT NOT NULL)")
             db.execute("INSERT INTO rg_metadata VALUES('schema_version','999')")
+            db.commit()
             with self.assertRaises(ValueError):
                 apply_migrations(db)
             self.assertNotIn("rg_platform_schema",
