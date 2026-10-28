@@ -4,7 +4,7 @@ RuleGenerator separates **capability contracts** from **research experiments**.
 
 ## CI: supported capabilities
 
-GitHub Actions installs the package and runs `python -m unittest discover -s tests -p 'test_*.py' -v` on Python 3.11 and 3.12. These tests protect maintained behavior, including:
+GitHub Actions installs the package and runs `python -m unittest discover -s tests -p 'test_*.py' -v` on Python 3.12. These tests protect maintained behavior, including:
 
 - typed AST execution, type checking, and program synthesis;
 - independent validation and safe admission of reusable operators;
