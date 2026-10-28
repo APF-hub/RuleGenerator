@@ -5,6 +5,7 @@ not a general autonomous curriculum or verified data provenance system.
 """
 from .discovery import discover
 from .engine import hash_of, synthesize
+from .provenance import Observation, verify_splits
 
 
 def run_learning_cycle(registry, name, training, validation, reuse_rows, *,
@@ -47,3 +48,29 @@ def run_learning_cycle(registry, name, training, validation, reuse_rows, *,
             "warm_checks_including_acquisition":acquisition["checks"]+warm["checks"],
             "validation_execution_count":len(training)+len(validation),
             "matched_evaluation_budget":True,"matched_total_budget":False}
+
+
+def run_manifest_learning_cycle(registry, name, observations, *,
+                                max_nodes=5, acquisition_budget=10000,
+                                reuse_budget=10000, max_generated=10000):
+    """Fail closed on declared provenance before calling the C1 learning cycle.
+
+    A manifest binds every observation to a caller-declared source and split.
+    It cannot establish that sources are authentic or independent in reality.
+    No registry mutation occurs before the complete manifest is validated.
+    """
+    manifest=verify_splits(observations)
+    counts=manifest["split_counts"]
+    if any(counts[s]==0 for s in ("train","validation","test")):
+        raise ValueError("train, validation and test splits required")
+    split_rows={s:[] for s in ("train","validation","test")}
+    for row in observations:
+        split_rows[row.split].append((row.inputs,row.expected))
+    result=run_learning_cycle(
+        registry,name,split_rows["train"],split_rows["validation"],
+        split_rows["test"],max_nodes=max_nodes,
+        acquisition_budget=acquisition_budget,reuse_budget=reuse_budget,
+        max_generated=max_generated)
+    return dict(result,manifest=manifest,
+                provenance="caller_declared_unverified",
+                promotion_provenance_verified=False)
