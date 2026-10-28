@@ -134,6 +134,12 @@ def check_body(expr,args,operators=None):
 class Registry:
     def __init__(self,path):
         self.db=sqlite3.connect(str(path))
+        try:
+            from .database_lifecycle import inspect_database
+            inspect_database(self.db)
+        except BaseException:
+            self.db.close()
+            raise
         self.db.execute('''CREATE TABLE IF NOT EXISTS operators(name TEXT PRIMARY KEY, body TEXT, args TEXT, output TEXT, evidence TEXT, status TEXT)''')
         self.db.execute('''CREATE TABLE IF NOT EXISTS failures(scope TEXT, candidate TEXT, reason TEXT, PRIMARY KEY(scope,candidate))''')
         self.db.commit()
