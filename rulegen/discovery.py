@@ -44,8 +44,9 @@ def discover(registry, name, training, validation, max_nodes=5, budget=10000, ma
     if {hash_of(x) for x,_ in training} & {hash_of(x) for x,_ in validation}:
         raise ValueError("train/validation input overlap")
     result=synthesize(registry,training,max_nodes=max_nodes,budget=budget,reuse=True,max_generated=max_generated)
+    validation_counter={"attempted":0}
     expr=result['program']
-    if expr is None:return dict(result,admitted=False,reason='no training solution')
+    if expr is None:return dict(result,admitted=False,reason='no training solution',validation_executions=0)
     generalized_input=generalize_shape(typ(training[0][0]))
     try:
         generic_output=typecheck(expr,generalized_input,registry.active())
@@ -55,11 +56,14 @@ def discover(registry, name, training, validation, max_nodes=5, budget=10000, ma
         # Independent validation may contain different types; enforce signature.
         accepted=registry.admit(name,body,[generalized_input],generic_output,
                                 [([x],y) for x,y in training],
-                                [([x],y) for x,y in validation])
+                                [([x],y) for x,y in validation],
+                                execution_counter=validation_counter)
     except (TypeError,ValueError,IndexError,KeyError) as exc:
-        return dict(result,admitted=False,reason=str(exc))
+        return dict(result,admitted=False,reason=str(exc),
+                    validation_executions=validation_counter['attempted'])
     return dict(result,admitted=accepted,operator=name if accepted else None,
-                signature=[generalized_input,generic_output],reason=None if accepted else 'validation mismatch')
+                signature=[generalized_input,generic_output],reason=None if accepted else 'validation mismatch',
+                validation_executions=validation_counter['attempted'])
 
 
 def benchmark(db_path):
