@@ -88,3 +88,10 @@ The exact M63 Python source files and tests have now been imported into GitHub. 
 Local source validation: `python -m unittest discover -s tests -v` completed **9/9 passing** before import; warnings about unclosed SQLite connections remain. CI now explicitly tests the canonical package on Python 3.11 and 3.12, plus the legacy standalone tests. **Remote CI status has not yet been confirmed.**
 
 The imported implementation includes scoped empirical mismatch caching, goal-directed typed-hole enumeration, persisted operators and a persistent exploration portfolio. **Still not integrated:** durable mid-search checkpoints, proof-based nogoods from M58, one unified evidence schema, and portfolio rewards driven by real synthesis trials. These remain separate acceptance criteria; exact source parity does not imply all historical functionality is integrated.
+
+
+## M66: durable search sessions (2026-10-28)
+
+Added `rulegen/session.py` and `tests/test_m66.py` directly to the canonical GitHub repository. `synthesize_resumable` stores a transactional cursor and matched program in SQLite; search identity includes observations, depth, reuse flag, primitive type signatures and active learned operator definitions. A restart resumes candidate **evaluation** without rechecking earlier candidates. Rebuilding the enumerator still costs O(previously generated candidates).
+
+**Local regression:** 12/12 tests passed (nine prior, three new). Existing SQLite connection warnings remain. Remote CI not yet verified. This is durable typed-hole search continuation, not M58's proof-based nogood integration or a unified evidence database.
