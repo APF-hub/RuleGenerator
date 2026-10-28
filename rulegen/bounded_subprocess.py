@@ -34,10 +34,10 @@ def run_bounded(argv, payload, *, timeout_seconds, memory_bytes=None,
     sel=selectors.DefaultSelector()
     output=bytearray()
     try:
-        # The request is capped at 1 MiB. Write it before collecting output;
-        # this is safe for the current worker, which reads all stdin first.
-        proc.stdin.write(payload)
-        proc.stdin.close()
+        # Nonblocking input avoids deadlock when a child does not read stdin.
+        os.set_blocking(proc.stdin.fileno(),False)
+        pending=memoryview(payload)
+        sel.register(proc.stdin,selectors.EVENT_WRITE)
         for pipe in (proc.stdout,proc.stderr):
             os.set_blocking(pipe.fileno(),False)
             sel.register(pipe,selectors.EVENT_READ)
@@ -48,6 +48,14 @@ def run_bounded(argv, payload, *, timeout_seconds, memory_bytes=None,
                 raise IsolatedExecutionError("isolated synthesis timeout")
             events=sel.select(min(remaining,0.1))
             for key,_ in events:
+                if key.fileobj is proc.stdin:
+                    try:written=os.write(proc.stdin.fileno(),pending[:65536])
+                    except BrokenPipeError:written=len(pending)
+                    pending=pending[written:]
+                    if not pending:
+                        sel.unregister(proc.stdin)
+                        proc.stdin.close()
+                    continue
                 chunk=os.read(key.fileobj.fileno(),min(65536,max_output_bytes+1-len(output)))
                 if not chunk:
                     sel.unregister(key.fileobj)
@@ -70,5 +78,6 @@ def run_bounded(argv, payload, *, timeout_seconds, memory_bytes=None,
         raise
     finally:
         sel.close()
+        if not proc.stdin.closed:proc.stdin.close()
         for pipe in (proc.stdout,proc.stderr):
             pipe.close()
