@@ -1,0 +1,97 @@
+{
+  "operator_admitted": true,
+  "acquisition_checks": 17,
+  "tasks": [
+    {
+      "baseline_checks": 17,
+      "reuse_checks": 1,
+      "baseline_valid": true,
+      "reuse_valid": true,
+      "baseline_program": [
+        "call",
+        "pair",
+        [
+          "call",
+          "snd",
+          [
+            "input"
+          ]
+        ],
+        [
+          "call",
+          "fst",
+          [
+            "input"
+          ]
+        ]
+      ],
+      "reuse_program": [
+        "call",
+        "swap",
+        [
+          "input"
+        ]
+      ]
+    },
+    {
+      "baseline_checks": 2,
+      "reuse_checks": 1,
+      "baseline_valid": false,
+      "reuse_valid": true,
+      "baseline_program": [
+        "call",
+        "pair",
+        [
+          "call",
+          "snd",
+          [
+            "input"
+          ]
+        ],
+        [
+          "const",
+          false
+        ]
+      ],
+      "reuse_program": [
+        "call",
+        "swap",
+        [
+          "input"
+        ]
+      ]
+    },
+    {
+      "baseline_checks": 6,
+      "reuse_checks": 1,
+      "baseline_valid": false,
+      "reuse_valid": true,
+      "baseline_program": [
+        "call",
+        "pair",
+        [
+          "const",
+          false
+        ],
+        [
+          "call",
+          "fst",
+          [
+            "input"
+          ]
+        ]
+      ],
+      "reuse_program": [
+        "call",
+        "swap",
+        [
+          "input"
+        ]
+      ]
+    }
+  ],
+  "cold_checks": 25,
+  "warm_marginal_checks": 3,
+  "warm_plus_acquisition_checks": 20,
+  "note": "Candidate checks only; wall time, memory and storage excluded."
+}
