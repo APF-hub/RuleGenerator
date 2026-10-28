@@ -18,25 +18,26 @@ def digest(value):
 class Evidence:
     def __init__(self, connection):
         self.db=connection
-        self.db.executescript("""
-        CREATE TABLE IF NOT EXISTS rg_metadata(
-            key TEXT PRIMARY KEY, value TEXT NOT NULL);
-        CREATE TABLE IF NOT EXISTS rg_evidence(
+        # Individual DDL statements participate in the caller's transaction.
+        # executescript() would implicitly commit and break atomic startup.
+        if not self.db.in_transaction:
+            raise RuntimeError("evidence initialization requires an active transaction")
+        self.db.execute("""CREATE TABLE IF NOT EXISTS rg_metadata(
+            key TEXT PRIMARY KEY, value TEXT NOT NULL)""")
+        self.db.execute("""CREATE TABLE IF NOT EXISTS rg_evidence(
             id INTEGER PRIMARY KEY AUTOINCREMENT,
             kind TEXT NOT NULL CHECK(kind IN
                 ('type_proof','empirical_failure','validation','search_trial')),
             scope TEXT NOT NULL, candidate TEXT NOT NULL,
             payload TEXT NOT NULL, created_at TEXT NOT NULL
-                DEFAULT (strftime('%Y-%m-%dT%H:%M:%fZ','now')));
-        CREATE INDEX IF NOT EXISTS rg_evidence_scope
-            ON rg_evidence(kind,scope,candidate);
-        """)
+                DEFAULT (strftime('%Y-%m-%dT%H:%M:%fZ','now')))""")
+        self.db.execute("""CREATE INDEX IF NOT EXISTS rg_evidence_scope
+            ON rg_evidence(kind,scope,candidate)""")
         row=self.db.execute("SELECT value FROM rg_metadata WHERE key='schema_version'").fetchone()
         if row is not None and int(row[0]) != SCHEMA_VERSION:
             raise ValueError("unsupported evidence schema version")
         self.db.execute("INSERT OR IGNORE INTO rg_metadata(key,value) VALUES('schema_version',?)",
                         (str(SCHEMA_VERSION),))
-        self.db.commit()
 
     def append_in_transaction(self,kind,scope,candidate,payload):
         """Insert without committing; caller owns the surrounding transaction."""
