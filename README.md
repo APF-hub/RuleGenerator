@@ -193,3 +193,19 @@ The result includes an `experiment_id`; `ExperimentStore('knowledge.sqlite').bes
 **Local M70–M71 isolated regression:** 6/6 tests passed with ResourceWarnings treated as errors. The source files are committed and GitHub file blobs verified for reconstruct/audio and both test files; `experiments.py` is functionally identical to the locally tested copy but includes a GitHub-only module docstring. This is **not yet full integrated M63–M71 test verification**; remote GitHub CI is unverified.
 
 **Critical remaining integration:** audio candidate programs currently use a simple oscillator tuple grammar, distinct from the canonical typed AST. The generic controller does not yet promote validated reconstructions into reusable typed operators. Experiment persistence stores candidate results but not discovered rule generalizations. Future work should integrate one typed executable program representation, a modality-neutral observation/evaluation protocol, operator promotion, and residual-driven experiment selection.
+
+
+## M72: Multiple observation views of the same audio
+
+`rulegen/spectrogram.py` adds a Hann-windowed STFT magnitude view, an 8-bit visualization-only spectrogram image, and `SpectrogramAudioAdapter` with a weighted waveform/spectral reconstruction objective. The **same** generic `reconstruct.search` and executable audio program grammar are used. The magnitude view is not independent data; it provides a different error landscape and exposes temporal frequency structure. A phase-inverted waveform has effectively identical magnitude STFT but nonzero waveform error, covered by regression.
+
+```python
+from rulegen.spectrogram import reconstruct_spectrogram_wav
+result = reconstruct_spectrogram_wav('input.wav', 'output.wav',
+                                    budget=120, waveform_weight=0.5,
+                                    database='knowledge.sqlite')
+```
+
+**Local verification:** M70–M72 isolated suite 10/10 passing. On the existing two-tone demonstration at 120 candidate evaluations, waveform MSE was **0.0037536868** with waveform-only loss, **0.0037536868** with 50/50 waveform/spectral loss, and **0.0056962050** with spectral-only loss. Thus **no improvement was observed** from joint loss on this small example. The spectral loss was computed from unquantized magnitudes; the grayscale spectrogram is for visualization only. This is a representation-integration milestone, not yet autonomous representation selection or rule discovery.
+
+Next: connect residual spectral ridges and onsets to **generic hypothesis proposals**, introduce typed executable program composition, and let the controller select useful representations based on measured improvement. The M72 tests use NumPy, now declared as a project dependency.
