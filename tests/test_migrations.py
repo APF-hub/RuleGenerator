@@ -2,7 +2,6 @@ import sqlite3
 import tempfile
 import unittest
 from pathlib import Path
-from unittest.mock import patch
 from rulegen.functional_registry import FunctionalRegistry
 from rulegen.migrations import apply_migrations,plan_migrations
 from rulegen.database_lifecycle import backup_database
@@ -25,12 +24,6 @@ class MigrationTests(unittest.TestCase):
 
     def test_transaction_failure_rolls_back(self):
         with sqlite3.connect(":memory:") as db:
-            original=db.execute
-            class FailingConnection(sqlite3.Connection):
-                pass
-            # Force SQL failure after CREATE, before INSERT.
-            db.execute("CREATE TRIGGER impossible BEFORE INSERT ON sqlite_master BEGIN SELECT 1; END") if False else None
-            db.execute("CREATE TABLE rg_platform_schema(version INTEGER PRIMARY KEY, applied_at TEXT NOT NULL)") if False else None
             # An unsupported evidence version must fail without migration side effects.
             db.execute("CREATE TABLE rg_metadata(key TEXT PRIMARY KEY,value TEXT NOT NULL)")
             db.execute("INSERT INTO rg_metadata VALUES('schema_version','999')")
