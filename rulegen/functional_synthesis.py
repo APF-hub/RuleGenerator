@@ -1,3 +1,4 @@
+from .cancellation import check_cancel
 """Bounded typed enumeration over the functional AST and promoted library.
 
 This is a deliberately small first-order synthesizer, not a general solution
@@ -21,7 +22,7 @@ def _key(node):
     return json.dumps(node,sort_keys=True,separators=(",",":"))
 
 def synthesize_functional(rows,registry=None,*,tier="math",max_nodes=7,
-                          budget=2000,constants=(0,1,2),reuse=True,max_generated=10000):
+                          budget=2000,constants=(0,1,2),reuse=True,max_generated=10000,cancel=None):
     """Rows: (environment_dict, expected_output), with consistent input types.
 
     Enumerates expressions by AST node count; learned operator calls cost one
@@ -54,6 +55,7 @@ def synthesize_functional(rows,registry=None,*,tier="math",max_nodes=7,
                 "runtime_errors":0,"exhausted":True}
     checks=0;type_pruned=0;runtime_errors=0
     for size in range(1,max_nodes+1):
+        check_cancel(cancel)
         if size>1:
             pool[size]=[]
             for name,arity in signatures.items():
@@ -61,12 +63,14 @@ def synthesize_functional(rows,registry=None,*,tier="math",max_nodes=7,
                 for sizes in itertools.product(range(1,size),repeat=arity):
                     if sum(sizes)!=size-1:continue
                     for args in itertools.product(*(pool[s] for s in sizes)):
+                        check_cancel(cancel)
                         if generated>=max_generated:
                             return {"program":None,"checks":checks,"type_pruned":type_pruned,
                                     "runtime_errors":runtime_errors,"exhausted":True}
                         pool[size].append(call(name,*args))
                         generated+=1
         for expr in pool[size]:
+            check_cancel(cancel)
             key=_key(expr)
             if key in seen:continue
             seen.add(key)
