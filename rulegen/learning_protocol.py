@@ -15,7 +15,7 @@ def canonical(value):
 def fingerprint(value):
     return hashlib.sha256(canonical(value).encode()).hexdigest()
 
-def evaluate_backend(backend,rows,registry,*,budget,max_nodes=5,reuse=True,max_generated=10000,cancel=None):
+def evaluate_backend(backend,rows,registry,*,budget,max_nodes=5,reuse=True,max_generated=10000,cancel=None,timeout_seconds=None):
     """Return a comparable record, without claiming equivalent search spaces."""
     if type(budget) is not int or budget<1:
         raise ValueError("budget must be a positive integer")
@@ -24,11 +24,11 @@ def evaluate_backend(backend,rows,registry,*,budget,max_nodes=5,reuse=True,max_g
     if type(max_generated) is not int or max_generated<1:
         raise ValueError("max_generated must be a positive integer")
     if backend=="legacy":
-        result=legacy_synthesize(registry,rows,max_nodes=max_nodes,budget=budget,reuse=reuse,max_generated=max_generated,cancel=cancel)
+        result=legacy_synthesize(registry,rows,max_nodes=max_nodes,budget=budget,reuse=reuse,max_generated=max_generated,cancel=cancel,timeout_seconds=timeout_seconds)
     elif backend=="legacy-goal":
-        result=synthesize_goal(registry,rows,max_nodes=max_nodes,budget=budget,reuse=reuse,max_generated=max_generated,cancel=cancel)
+        result=synthesize_goal(registry,rows,max_nodes=max_nodes,budget=budget,reuse=reuse,max_generated=max_generated,cancel=cancel,timeout_seconds=timeout_seconds)
     elif backend=="functional":
-        result=synthesize_functional(rows,registry,max_nodes=max_nodes,budget=budget,reuse=reuse,max_generated=max_generated,cancel=cancel)
+        result=synthesize_functional(rows,registry,max_nodes=max_nodes,budget=budget,reuse=reuse,max_generated=max_generated,cancel=cancel,timeout_seconds=timeout_seconds)
     else:
         raise ValueError("unknown backend")
     if type(result["checks"]) is not int or not 0<=result["checks"]<=budget:

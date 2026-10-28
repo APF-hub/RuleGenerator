@@ -1,4 +1,4 @@
-from .cancellation import check_cancel
+from .cancellation import check_cancel, make_deadline
 """M60: polymorphic typed holes, reusable executable operators, persisted evidence.
 
 This deliberately small engine uses a generic typed combinator basis. Learned
@@ -188,11 +188,13 @@ class Registry:
     def failed(self,scope,expr):
         return self.db.execute('SELECT 1 FROM failures WHERE scope=? AND candidate=?',(scope,encode(expr))).fetchone() is not None
 
-def synthesize(registry,rows,max_nodes=4,budget=10000,reuse=True,max_generated=10000,cancel=None):
+def synthesize(registry,rows,max_nodes=4,budget=10000,reuse=True,max_generated=10000,cancel=None,timeout_seconds=None):
     """Enumerate typed expressions, pruning invalid types before execution."""
     if not rows:raise ValueError('empty observations')
     if any(type(n) is not int or n<1 for n in (max_nodes,budget,max_generated)):
         raise ValueError('positive integer limits required')
+    deadline=make_deadline(timeout_seconds)
+    check_cancel(cancel,deadline)
     ti=typ(rows[0][0]);to=typ(rows[0][1]);scope=hash_of(rows)
     ops=registry.active() if reuse else {}
     pool={1:[['input']]+[['const',v] for v in (0,1,True,False)]}
@@ -201,7 +203,7 @@ def synthesize(registry,rows,max_nodes=4,budget=10000,reuse=True,max_generated=1
     if generated>max_generated:
         return {'program':None,'checks':0,'type_pruned':0,'failure_skips':0,'exhausted':True}
     for n in range(1,max_nodes+1):
-        check_cancel(cancel)
+        check_cancel(cancel,deadline)
         if n>1:
             pool[n]=[]
             for name in list(PRIMS)+list(ops):
@@ -209,7 +211,7 @@ def synthesize(registry,rows,max_nodes=4,budget=10000,reuse=True,max_generated=1
                 for sizes in itertools.product(range(1,n),repeat=arity):
                     if sum(sizes)!=n-1:continue
                     for args in itertools.product(*(pool[s] for s in sizes)):
-                        check_cancel(cancel)
+                        check_cancel(cancel,deadline)
                         expr=['call',name,*args]
                         try:typecheck(expr,ti,ops)
                         except TypeError:type_pruned+=1;continue
@@ -218,7 +220,7 @@ def synthesize(registry,rows,max_nodes=4,budget=10000,reuse=True,max_generated=1
                         pool[n].append(expr)
                         generated+=1
         for expr in pool[n]:
-            check_cancel(cancel)
+            check_cancel(cancel,deadline)
             signature=encode(expr)
             if signature in seen:continue
             seen.add(signature)
