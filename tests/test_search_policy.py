@@ -17,6 +17,14 @@ class SearchPolicyTests(unittest.TestCase):
     def test_compare_three_strategies(self):
         results=[]
         policy=ExperiencePolicy()
+        # Train exclusively on distinct seeds, then freeze during evaluation.
+        for family,level in (("arithmetic",1),("arithmetic",2),("pair",1)):
+            task=generate_task(42,family=family,complexity=level)
+            with tempfile.TemporaryDirectory() as tmp:
+                with Registry(Path(tmp)/"train.sqlite") as registry:
+                    guided_synthesize(registry,task["training"],mode="learned",
+                                      policy=policy,record_experience=True,
+                                      max_nodes=5,budget=300,max_generated=300,reuse=False)
         for family,level in (("arithmetic",1),("arithmetic",2),("pair",1)):
             for seed in (0,1,2):
                 task=generate_task(seed,family=family,complexity=level)
