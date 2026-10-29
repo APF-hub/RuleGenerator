@@ -27,6 +27,7 @@ Each algorithmic milestone requires three matched-budget controls: existing size
 
 - G1b: integrate observation contracts with the existing experiment ledger; enforce content hashes and replay; prevent split leakage.
 - G1c: add immutable prospective prediction, shared explanation-language and observer-feedback contracts linked to G1b provenance.
+- G1d: add actionable knowledge-gap and contribution records linked to exact claims, requests and acceptance criteria.
 - G2a: build sandboxed, versioned generator execution with explicit costs, limits and seeds.
 - G2: generic typed transform grammar and method-generation portfolio, with identity/random baselines.
 - G3: independent utility scoring and evidence-gated reusable observation-method registry.
@@ -54,3 +55,22 @@ accuracy. Keep explanation fidelity, observer comprehension, reproduction,
 predictive calibration, transfer and cost as separate metrics. Freeze learning
 and explanation adaptation during held-out evaluation, or explicitly report
 online adaptation with a separate untouched evaluation set.
+
+## Collaborative gap resolution
+
+Section 12 extends observer feedback into shared discovery. Expose supported
+understanding, surprise and unresolved uncertainty; accept attributed knowledge
+and inspiration as candidates; combine tested partial programs and explanations.
+
+| Stage | Work | Dependencies and acceptance |
+|---|---|---|
+| G1d | Knowledge-gap/help-request and contribution schemas | G1c; immutable claim links, provenance, acceptance criteria and external-knowledge attribution |
+| G4c | Negotiated gap clarification and candidate interpretation | G4b; preserve source meaning, request clarification, distinguish suggestions from validated evidence |
+| G5b | Shared claim/gap graph and typed program composition | G3b/G5; dependency and unit compatibility; end-to-end tests; retain competing explanations |
+| G6c | Bounded collaborative experimentation | G6b plus execution limits; no evidence-free cycles; matched total-cost single-system controls |
+| G10c | Collaborative reproduction and mastery assessment | G10b; evidence-lineage independence, transfer and explicit remaining gaps |
+
+Parallel work is optional and justified by task structure and measured outcomes.
+A participant's confidence or agreement is not independent evidence; disclose
+shared models/data and deduplicate copied results. Report partial progress and
+unresolved gaps instead of forcing consensus or claiming complete understanding.
