@@ -355,3 +355,106 @@ rendering; G6b depends on prediction scoring and experiment selection. Use
 explicit evaluator-only feedback during frozen tests; observer feedback used for
 training cannot also count as untouched held-out evaluation. No new general
 synthesis engine is required by this extension.
+
+## 12. Communicating knowledge gaps and collaborative discovery
+
+**Architectural requirement:** Expose the current explanation, its unresolved
+gaps and the evidence needed to address them in the agreed observer language.
+A person or another system may contribute knowledge, experience, analogies,
+measurements, experiments or partial programs. Participants may address different
+aspects and compose a shared explanatory program through validated interfaces.
+This is a proposed distributed capability, not an implemented agent network.
+
+### 12.1 A knowledge-gap report is an actionable scientific object
+
+For each unresolved issue, publish a versioned report referencing the exact
+prediction, explanation, observation and evidence records. Include:
+
+- What is currently explained, the supported scope and the remaining residual.
+- The predicted outcome/distribution and observed outcome, with units, uncertainty,
+  comparison metric and the location/time/conditions of the discrepancy.
+- Known limitations, missing observations and alternative hypotheses.
+- A diagnosis status: unexamined, suspected measurement error, irreducible noise,
+  representation limitation, model conflict, missing mechanism or unresolved
+  identifiability. These are hypotheses until tested.
+- Prior attempts and counterexamples, unresolved dependencies, resource limits
+  and why the issue matters for the task.
+- A concrete help request: clarify a concept, suggest a mechanism, supply a
+  measurement, design a discriminating test, implement a component or reproduce
+  a result.
+- Acceptance criteria and an executable minimal reproducer where available.
+
+Surprise measures unexpected outcomes under a particular model; it does not
+measure every knowledge gap. The system may have broad uncertainty or multiple
+indistinguishable explanations without experiencing a surprising outcome.
+Report those gaps too. Describe measured model discrepancies rather than
+asserting a subjective experience of surprise or introspective certainty.
+
+### 12.2 Contributions become testable candidates
+
+Allow contributions in the negotiated vocabulary, with source, authorship,
+version, assumptions, intended scope and dependencies. Preserve a natural-language
+suggestion and its proposed executable interpretation as linked but distinct
+artifacts. Seek clarification when their meaning is ambiguous, and expose that
+interpretation for correction before claiming it implements the suggestion.
+
+External knowledge may seed a hypothesis or method without being counted as
+autonomously discovered. Record whether a claim is externally supplied,
+internally generated, derived from prior knowledge or experimentally supported.
+Expertise and analogy guide search; they are not execution results or formal
+proofs. Keep contributed private knowledge within its declared access scope.
+
+Evaluate contributions against the original gap and reserved tests. A proposed
+solution may close, narrow, split or invalidate a gap; report the evidence and
+remaining limitations. Retain rejected alternatives and useful negative results.
+Do not silently erase the prediction that motivated the contribution.
+
+### 12.3 Decompose work and compose explanations
+
+Use a shared graph of claims, gaps, experiments, artifacts and dependencies.
+Assign bounded subproblems with explicit input/output types, units, assumptions,
+resource limits and required evidence. Roles can include proposer, representation
+investigator, program synthesizer, experiment designer, critic and reproducer;
+roles do not require separate model instances.
+
+Different participants may develop competing explanations or solve independent
+parts. Before integration, check representation/semantic compatibility, units,
+sampling conventions, uncertainty assumptions and dependency versions. Validate
+each component, then run end-to-end tests on the composed program; locally
+successful components can fail together. Attribute improvement and costs to
+their evidence lineage.
+
+Keep conflicting claims explicit until discriminating evidence is available.
+Agreement among participants does not establish truth. Repeated citations or
+copies of one result are one evidence lineage, not independent replications.
+Systems sharing a model, dataset or runtime may share failure modes; disclose
+these dependencies when reporting independent confirmation.
+
+Use explicit ownership/version checks for shared artifact updates. Bound work
+and stop duplicate or cyclic requests that produce no new evidence. Unproductive
+collaboration must return an unresolved-gap report, not recurse indefinitely.
+Communication overhead, reproduction and integration costs are part of the
+discovery budget. Track whether collaboration improves outcomes over a matched
+single-system baseline; additional participants alone are not an improvement.
+
+### 12.4 Collaborative output and acceptance gates
+
+The shared result consists of a versioned executable explanation and task-solving
+program, its component/dependency graph, evidence, contributor provenance,
+external reproduction reports and remaining gaps. Mastery reports remain scoped
+to tested capabilities. Better communication and a clearer unresolved question
+can be valuable intermediate outcomes even before a solution is found.
+
+| Milestone | Deliverable | Acceptance evidence |
+|---|---|---|
+| G1d | Versioned knowledge-gap and contribution contracts | Reports reference exact predictions/claims; supplied knowledge and derived evidence distinguished |
+| G4c | Observer dialogue that turns gaps and suggestions into testable work | Faithful translation, clarification handling and contribution attribution |
+| G5b | Shared claim/gap graph and typed partial-program composition | Component compatibility, conflict preservation, dependency invalidation and end-to-end reproduction |
+| G6c | Bounded collaborative experiment coordination | No evidence-free request cycles; cost accounting; improved gap resolution against matched controls |
+| G10c | Independent collaborative mastery evaluation | Traceable contributions, correlated-evidence controls, transfer and reproducibility on external tasks |
+
+Implement G1d alongside G1c, reuse the existing provenance and registry mechanisms,
+and add G4c after the observer language/feedback contract works. G5b/G6c follow
+portable reproduction and bounded task execution. No external messages or work
+dispatch are performed merely by introducing these contracts; actual interaction
+requires the relevant user-authorized channel.
