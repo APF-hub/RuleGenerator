@@ -26,9 +26,31 @@ Each algorithmic milestone requires three matched-budget controls: existing size
 ## Immediate next PRs
 
 - G1b: integrate observation contracts with the existing experiment ledger; enforce content hashes and replay; prevent split leakage.
+- G1c: add immutable prospective prediction, shared explanation-language and observer-feedback contracts linked to G1b provenance.
 - G2a: build sandboxed, versioned generator execution with explicit costs, limits and seeds.
 - G2: generic typed transform grammar and method-generation portfolio, with identity/random baselines.
 - G3: independent utility scoring and evidence-gated reusable observation-method registry.
 - G4a: competence-progress curriculum scheduler with a preregistered frozen evaluation suite.
 
 **Stop condition:** do not expand into full music reconstruction until generic transforms and accumulated methods demonstrate positive transfer on multiple disjoint synthetic signal/mechanism families.
+
+## Predictive interaction and external explanation
+
+The architecture's section 11 makes external communication and reproducibility
+part of the discovery loop. These are planned contracts, not implemented
+capabilities. Integrate them with existing ledgers and execution paths.
+
+| Stage | Work | Dependencies and acceptance |
+|---|---|---|
+| G1c | Prediction, explanation-language and observer-feedback records | G1b/G2a provenance; commit prediction before outcome; preserve claim and contract versions |
+| G3b | Portable executable claim package and reproduction runner | Stable program/runtime digests; reproduce in a fresh process without private state; reject tampering |
+| G4b | Faithful explanations in an observer-agreed vocabulary | G3b; expand abstractions on request; assess comprehension independently of claim correctness |
+| G6b | Diagnose surprise and select experiments from external feedback | G6/G6a plus calibrated prediction scores; distinguish noise, execution failure, misunderstanding and model failure |
+| G10b | Independent reproduction and mastery assessment | Separate same-code replay, independent implementation, new external observations and formal proof |
+
+Record successful and failed reproduction attempts. Empirical agreement is not
+universal proof, and understandable explanations do not by themselves establish
+accuracy. Keep explanation fidelity, observer comprehension, reproduction,
+predictive calibration, transfer and cost as separate metrics. Freeze learning
+and explanation adaptation during held-out evaluation, or explicitly report
+online adaptation with a separate untouched evaluation set.
