@@ -458,3 +458,129 @@ and add G4c after the observer language/feedback contract works. G5b/G6c follow
 portable reproduction and bounded task execution. No external messages or work
 dispatch are performed merely by introducing these contracts; actual interaction
 requires the relevant user-authorized channel.
+
+## 13. Environmental knowledge intake, bounded work and shared experiments
+
+**Architectural requirement:** Accept environmental information independently
+of the task instance being solved. Partial explanations, executable programs,
+tools, experiment protocols, measurements and reproduction reports may improve
+the system's knowledge and capabilities after compatibility and evidence checks.
+Maintain a persistent backlog of useful unresolved surprises and experiments.
+Delegation and partitioning are optional means of resolving that backlog under
+explicit cost and progress limits. These remain proposed capabilities.
+
+### 13.1 Separate task input, environmental knowledge and control
+
+Maintain three logically distinct interfaces:
+
+| Interface | Content | Effect |
+|---|---|---|
+| Task input | Problem specification, allowed observations, requested output and success criteria | Defines the current problem |
+| Environmental knowledge | External claims, partial programs, tools, measurements, experiment packages and feedback | Proposes knowledge/capability updates or new investigative work |
+| Authorized control | Goals, budgets, permissions, evaluation policy and lifecycle decisions | Governs what may be executed, adopted or delegated |
+
+Attach source, time, content identity, version and evidence lineage to intake.
+Environmental information cannot silently redefine the task, grant permissions
+or lower acceptance criteria. A contributed program is data until explicit
+bounded execution; receipt is not execution or adoption. Validate dependencies,
+types, units, assumptions and required capabilities before trial.
+
+Distinguish external measurements from explanations of those measurements, and
+both from programs proposing to reproduce them. Track exposure to external
+solutions: they can legitimately teach the system but cannot then be counted as
+unaided discoveries or unseen evaluation evidence.
+
+### 13.2 Trial before integration
+
+Use the existing registry, ledger and execution boundaries rather than creating
+a competing knowledge authority. Intake progresses through received -> candidate
+-> isolated trial -> evaluated -> admitted, rejected or deferred. Admission
+requires a stated scope and a versioned evidence record; rejection preserves the
+reason and context. Integration must be reversible.
+
+Evaluate a candidate against the existing system using explicit baseline and
+candidate versions, the affected task/knowledge scope, existing compatible
+evidence, reserved tests, regression checks and measured costs. Report accuracy,
+prediction, reproduction, complexity and cost separately. An improvement in one
+metric may incur a documented tradeoff; do not call it an unconditional gain.
+Record externally supplied knowledge and improvements independently of the
+system's own synthesis discoveries.
+
+A program can be a useful partial component without explaining the whole task.
+Attach unresolved assumptions and typed input/output contracts, then validate
+the composed solution end to end. Admission must invalidate or recheck affected
+dependents when a dependency changes or is retired.
+
+### 13.3 Prevent circular evidence and repeated wrong turns
+
+Use content/dependency hashes and claim lineage to recognize exact duplicates,
+renamed wrappers and copied evidence where detectable. Semantic similarity may
+suggest a duplicate but is not proof of equivalence. Detect provenance cycles:
+a claim returning through another participant has acquired no independent
+support merely by circulating.
+
+Before attempting work, consult compatible prior trials, failures and current
+dependencies. A work identity includes the target gap, candidate/program,
+evidence/data scope, dependency versions, evaluation protocol and relevant
+execution conditions. Do not repeat a completed deterministic attempt unchanged.
+Allow stochastic replication when the protocol calls for it; each replicate
+uses an explicit seed/sample and a bounded replication budget.
+
+An unsuccessful empirical trial is scoped evidence, not a universal
+impossibility proof. Reopen a failed direction when new data, a changed program
+or dependency, a revised assumption, a larger justified budget or a genuinely
+different test can change the conclusion. Record the reopening reason.
+Failures without such changes remain recorded rather than being redispatched.
+
+Delegation cannot route work back to an ancestor as purported new work. Bound
+depth, retries, fan-out, execution and communication under one parent budget.
+Stop or defer work with repeated equivalent outputs and no relevant evidence,
+capability or uncertainty change. A clearer gap, eliminated alternative or
+valid negative result can count as progress; additional messages and task
+creation alone cannot. Report a scoped unresolved result when exhausted.
+
+### 13.4 Persistent experiment and surprise backlog
+
+Each item references a claim/gap and contains the question, relevant surprise or
+uncertainty, prior attempts, candidate experiment, expected informative outcome,
+acceptance/stop criteria, dependencies, estimated cost, owner/lease and budget.
+Track statuses proposed, ready, running, blocked, deferred, resolved, rejected
+and superseded with recorded transitions. Keep evidence-backed outcomes separate
+from predicted utility.
+
+Prioritize work by task relevance, plausible information/competence gain,
+novelty, dependency readiness, uncertainty and cost. These are scheduling
+estimates, not credited discoveries. Reserve bounded exploration and retain
+diverse stepping stones; periodically consolidate duplicate/superseded items
+and archive low-value work rather than allowing unlimited backlog growth.
+Blocked items need a specific missing dependency and a wake-up condition.
+
+Partition work only where subproblem interfaces and acceptance criteria are
+explicit. Delegate bounded work packets containing permitted inputs, claim/gap
+identity, executable context, requested result/evidence and limits. Merge through
+one accountable result owner with version checks, conflict handling and
+end-to-end validation. Participant count, repeated approval or task completion
+does not itself establish improved task performance.
+
+Share experiments as versioned packages with a distinct protocol, data and
+result identity. Participants report the actual environment, procedure,
+observations and failures. Preserve evaluator-only ground truth and access
+boundaries when sharing, and label reused evidence rather than charging it as
+a fresh independent experiment.
+
+### 13.5 Implementation and acceptance gates
+
+| Milestone | Deliverable | Acceptance evidence |
+|---|---|---|
+| G1e | Distinct environmental intake and versioned candidate-update records | Task/control boundaries preserved; source and dependency identity; no execution on receipt |
+| G3c | Baseline/candidate integration trials and reversible admission | Independent scoped utility, regression evidence, measured cost and dependency-aware rollback |
+| G4d | Persistent experiment/surprise backlog and bounded scheduler | Deduplication, ready/blocked/deferred states, explicit wake-up/stop criteria and no unchanged deterministic retries |
+| G6d | Shared experiment and delegation protocol | No provenance/delegation cycles; scoped failures can reopen on changed evidence; total parent budget enforced |
+| G10d | Collaborative efficiency evaluation | Acquisition/integration/communication costs included; compare against matched single-system and no-external-knowledge controls |
+
+Extend G1c/G1d records with G1e; integrate G3c with the existing admission path.
+Build G4d before expanding distributed execution. Start with a single-process
+backlog and executor to establish correct transitions, evidence reuse and stop
+behavior; add participant transport after G3b/G5b contracts work. Evaluate
+efficiency on actual task resolution and informative partial outcomes rather
+than promising that every open-ended discovery task will converge.
