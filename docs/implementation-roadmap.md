@@ -28,6 +28,8 @@ Each algorithmic milestone requires three matched-budget controls: existing size
 - G1b: integrate observation contracts with the existing experiment ledger; enforce content hashes and replay; prevent split leakage.
 - G1c: add immutable prospective prediction, shared explanation-language and observer-feedback contracts linked to G1b provenance.
 - G1d: add actionable knowledge-gap and contribution records linked to exact claims, requests and acceptance criteria.
+- G1e: separate environmental knowledge intake from task inputs and authorized control; retain candidate-update lineage.
+- G4d: implement a single-process persistent experiment/surprise backlog with deduplication, leases, bounded retries and stop/wake-up conditions before distributed delegation.
 - G2a: build sandboxed, versioned generator execution with explicit costs, limits and seeds.
 - G2: generic typed transform grammar and method-generation portfolio, with identity/random baselines.
 - G3: independent utility scoring and evidence-gated reusable observation-method registry.
@@ -74,3 +76,24 @@ Parallel work is optional and justified by task structure and measured outcomes.
 A participant's confidence or agreement is not independent evidence; disclose
 shared models/data and deduplicate copied results. Report partial progress and
 unresolved gaps instead of forcing consensus or claiming complete understanding.
+
+## Environmental knowledge and efficient work coordination
+
+Section 13 adds external partial explanations, programs, tools and experiment
+packages as candidate knowledge updates through an interface distinct from task
+input and authorized control. Intake never implies execution or adoption.
+
+| Stage | Work | Dependencies and acceptance |
+|---|---|---|
+| G1e | Environmental intake and candidate-update contracts | G1c/G1d; task/control separation, source and evidence lineage |
+| G3c | Isolated baseline/candidate trials and reversible adoption | Existing registry plus G3b; scoped gain, regressions, costs and dependent revalidation |
+| G4d | Persistent backlog of experiments, surprises and unresolved gaps | G1d/G1e; bounded scheduler, duplicate reuse, leases, stop criteria and explicit reopening reasons |
+| G6d | Shared experiments and bounded delegated work | G3b/G5b/G4d; no circular evidence or ancestor redispatch; one parent budget and end-to-end validation |
+| G10d | External-knowledge and collaboration efficiency experiments | Matched total-cost controls; distinguish supplied knowledge, independent evidence and autonomous discovery |
+
+Implement the backlog locally before adding distributed transport. Preserve
+scoped negative results and useful unresolved work; repeat only when conditions
+change or a bounded stochastic replication protocol requires it. Consolidate
+duplicate items, detect circular citations and retain explicit wake-up conditions
+for blocked/deferred experiments. Estimated usefulness guides scheduling but
+does not count as measured learning gain.
