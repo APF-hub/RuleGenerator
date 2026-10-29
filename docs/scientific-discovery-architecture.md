@@ -218,3 +218,140 @@ A general generator could first create simple periodic signals, then mixtures, m
 | G8a | Progressive synthetic audio generative benchmark | Demonstrates transfer to unseen mechanisms and independently sampled recordings |
 
 **Implementation order:** Couple G1 observation contracts with G2a experiment provenance before training from synthetic data; then implement generic perturbation and mechanism composition, frozen independent evaluation, and adaptive curricula. Do not claim validated autonomous scientific discovery before cross-domain external tests.
+
+## 11. Predictive interaction, shared explanations and independent reproduction
+
+**Architectural requirement:** The system must expose its current knowledge as
+predictions and executable explanations that an external observer can inspect,
+understand, challenge and reproduce. Internal reconstruction success alone does
+not establish communicable understanding or mastery. This is a proposed
+capability contract, not implemented behavior.
+
+### 11.1 Predict before observing, then investigate surprise
+
+Given available input/context, the system records a versioned prediction from
+its current model before obtaining the target outcome. The record includes
+model/library digests, input and observation-method identities, assumptions,
+predicted values or distributions, uncertainty, units, validity scope, and the
+declared comparison metric. If the outcome is already available during fitting,
+label the result reconstruction or retrospective fit rather than a prospective
+prediction.
+
+On receiving an outcome, compare it with the recorded prediction and retain
+both. Surprise is a discrepancy relative to the predictive distribution and
+measurement model, not simply raw error. Use proper predictive scores where
+applicable, and distinguish stochastic variation, measurement failure,
+distribution shift and a potentially missing mechanism. Check measurement
+integrity before changing explanatory rules; surprising noise must not become
+an unlimited source of curiosity reward.
+
+A match provides scoped supporting evidence; a mismatch triggers diagnosis,
+alternative hypotheses, observation-method changes or an informative experiment.
+Small routine errors need not trigger expensive search. Prioritize reducible
+uncertainty, hypothesis discrimination, learning progress and cost; retain
+exploration of unfamiliar phenomena. Never silently revise an earlier prediction
+after seeing its outcome. Model revisions require a new version and evaluation
+on new or reserved observations.
+
+### 11.2 Agree an explanation language with the observer
+
+An external observer may be a person or another machine. Establish a versioned
+communication contract containing:
+
+- Observer goal, relevant expertise, preferred language, notation and granularity.
+- Typed vocabulary, definitions, units, coordinate/time conventions and assumptions.
+- Accepted executable format, interpreter/runtime semantics and available tools.
+- Requested claim scope, evidence standard, error metric and numeric tolerances.
+- A procedure to request clarification, expand a term or reject an unsupported claim.
+
+Use an executable core with audience-specific renderings such as equations,
+structured programs, annotated audio events, diagrams or plain-language accounts.
+A learned abstraction may be introduced as a new term only with its definition,
+dependencies and examples; expand it to accepted primitives on request. Language
+negotiation must not require the observer to supply the hidden generating rules.
+
+Generate explanations from the actual model and execution trace. A simpler
+explanation must declare approximations and measured fidelity to that model.
+Do not substitute a plausible narrative for the mechanism that produced the
+prediction. Changing vocabulary or presentation must not silently change the
+underlying claim. Observer comprehension feedback may improve communication
+without providing evidence that the physical or mathematical claim is true.
+
+### 11.3 Export a reproducible claim package
+
+Each published prediction or explanation should reference a portable,
+content-addressed package with:
+
+1. Claim/prediction identity, creation order and model/library/version digests.
+2. Input artifacts or a declared access procedure, provenance and measurement context.
+3. Executable program, parameters and expanded definitions or pinned dependencies.
+4. Runtime/environment specification, seeds and resource requirements.
+5. Expected outputs, comparison procedure, numeric tolerances and known limits.
+6. Evidence, counterexamples, alternative explanations and uncertainty.
+7. Explicit status: conjectured, observed agreement, independently reproduced,
+   or formally proved under named assumptions.
+
+A minimal external runner should execute the exported program without access to
+the discovery system's private mutable state. Report unavailable dependencies,
+restricted inputs or failed checks as incomplete reproduction rather than
+success. Validate hashes and environment compatibility before execution; use
+bounded execution for received artifacts. Reproduction costs count in total
+discovery costs.
+
+Distinguish replay of the same artifact from an independently implemented
+replication and from validation against new external measurements. Record which
+occurred. Reproducing a waveform or image establishes the declared rendering
+claim within tolerance, not the unique original instruments, scene or causal
+history. Formal claims require a machine-checkable certificate and a named
+checker/assumption set; empirical matches must not be presented as universal
+proofs.
+
+### 11.4 External feedback closes the learning loop
+
+The observer can report reproducibility outcomes, comprehension difficulties,
+alternative explanations and counterexamples. Link each feedback record to the
+exact claim, package, explanation and communication-contract versions. Record
+observer role, environment, attempted procedure, actual outputs, tolerances,
+evidence origin and any reproduction independence.
+
+Route feedback according to its meaning:
+
+- Execution/reproduction failure -> artifact, dependency, runtime or semantic diagnosis.
+- Misunderstanding -> vocabulary negotiation or explanation revision.
+- New conflicting observation -> prediction diagnosis and model/measurement experiments.
+- Successful replication -> scoped evidence for the reproduced claim.
+- New question or proposed intervention -> candidate experiment, with its own cost.
+
+Self-play role agreement is synthetic/internal feedback; never relabel it as an
+independent external confirmation. Communication optimization must not reward
+persuasiveness, approval or verbosity as substitutes for accuracy. Separate
+comprehension, faithfulness, reproducibility, predictive calibration and transfer
+metrics. An observer can understand a wrong explanation or reproduce a wrong
+model; preserve those distinct outcomes.
+
+The loop becomes: input/context -> recorded prediction and explanation ->
+outcome comparison -> surprise or agreement -> targeted experiment ->
+versioned knowledge revision -> exported explanation/program -> external
+reproduction and comprehension feedback -> further investigation.
+
+Trust should be supported by an inspectable history of successful predictions,
+faithful explanations, independent reproduction and openly retained failures.
+Mastery remains scoped to tested conditions, including changed inputs and
+interventions; observer approval alone cannot establish it.
+
+### 11.5 Implementation and acceptance gates
+
+| Milestone | Deliverable | Acceptance evidence |
+|---|---|---|
+| G1c | Prediction, communication-contract and observer-feedback schemas linked to provenance | Predictions immutable after outcome; units/versions checked; feedback tied to exact claims |
+| G3b | Exported executable explanation/claim package and minimal reproduction runner | Fresh-process execution without private state; missing/tampered dependencies rejected; tolerances reported |
+| G4b | Audience-adaptive explanation and clarification protocol | Faithful expansion to agreed vocabulary; separately measured comprehension and correctness |
+| G6b | Surprise diagnosis and external-feedback-driven experiment selection | Noise controls, recorded alternatives, independent predictive improvement at matched cost |
+| G10b | Independent reproduction and task-mastery evaluation | Separate replay, independent implementation, new measurements and proof outcomes; scoped trust report |
+
+Implement G1c alongside G1b/G2a record integration, then G3b once program and
+runtime identities can be exported reliably. G4b depends on faithful program
+rendering; G6b depends on prediction scoring and experiment selection. Use
+explicit evaluator-only feedback during frozen tests; observer feedback used for
+training cannot also count as untouched held-out evaluation. No new general
+synthesis engine is required by this extension.
