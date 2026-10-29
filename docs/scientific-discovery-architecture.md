@@ -218,3 +218,369 @@ A general generator could first create simple periodic signals, then mixtures, m
 | G8a | Progressive synthetic audio generative benchmark | Demonstrates transfer to unseen mechanisms and independently sampled recordings |
 
 **Implementation order:** Couple G1 observation contracts with G2a experiment provenance before training from synthetic data; then implement generic perturbation and mechanism composition, frozen independent evaluation, and adaptive curricula. Do not claim validated autonomous scientific discovery before cross-domain external tests.
+
+## 11. Predictive interaction, shared explanations and independent reproduction
+
+**Architectural requirement:** The system must expose its current knowledge as
+predictions and executable explanations that an external observer can inspect,
+understand, challenge and reproduce. Internal reconstruction success alone does
+not establish communicable understanding or mastery. This is a proposed
+capability contract, not implemented behavior.
+
+### 11.1 Predict before observing, then investigate surprise
+
+Given available input/context, the system records a versioned prediction from
+its current model before obtaining the target outcome. The record includes
+model/library digests, input and observation-method identities, assumptions,
+predicted values or distributions, uncertainty, units, validity scope, and the
+declared comparison metric. If the outcome is already available during fitting,
+label the result reconstruction or retrospective fit rather than a prospective
+prediction.
+
+On receiving an outcome, compare it with the recorded prediction and retain
+both. Surprise is a discrepancy relative to the predictive distribution and
+measurement model, not simply raw error. Use proper predictive scores where
+applicable, and distinguish stochastic variation, measurement failure,
+distribution shift and a potentially missing mechanism. Check measurement
+integrity before changing explanatory rules; surprising noise must not become
+an unlimited source of curiosity reward.
+
+A match provides scoped supporting evidence; a mismatch triggers diagnosis,
+alternative hypotheses, observation-method changes or an informative experiment.
+Small routine errors need not trigger expensive search. Prioritize reducible
+uncertainty, hypothesis discrimination, learning progress and cost; retain
+exploration of unfamiliar phenomena. Never silently revise an earlier prediction
+after seeing its outcome. Model revisions require a new version and evaluation
+on new or reserved observations.
+
+### 11.2 Agree an explanation language with the observer
+
+An external observer may be a person or another machine. Establish a versioned
+communication contract containing:
+
+- Observer goal, relevant expertise, preferred language, notation and granularity.
+- Typed vocabulary, definitions, units, coordinate/time conventions and assumptions.
+- Accepted executable format, interpreter/runtime semantics and available tools.
+- Requested claim scope, evidence standard, error metric and numeric tolerances.
+- A procedure to request clarification, expand a term or reject an unsupported claim.
+
+Use an executable core with audience-specific renderings such as equations,
+structured programs, annotated audio events, diagrams or plain-language accounts.
+A learned abstraction may be introduced as a new term only with its definition,
+dependencies and examples; expand it to accepted primitives on request. Language
+negotiation must not require the observer to supply the hidden generating rules.
+
+Generate explanations from the actual model and execution trace. A simpler
+explanation must declare approximations and measured fidelity to that model.
+Do not substitute a plausible narrative for the mechanism that produced the
+prediction. Changing vocabulary or presentation must not silently change the
+underlying claim. Observer comprehension feedback may improve communication
+without providing evidence that the physical or mathematical claim is true.
+
+### 11.3 Export a reproducible claim package
+
+Each published prediction or explanation should reference a portable,
+content-addressed package with:
+
+1. Claim/prediction identity, creation order and model/library/version digests.
+2. Input artifacts or a declared access procedure, provenance and measurement context.
+3. Executable program, parameters and expanded definitions or pinned dependencies.
+4. Runtime/environment specification, seeds and resource requirements.
+5. Expected outputs, comparison procedure, numeric tolerances and known limits.
+6. Evidence, counterexamples, alternative explanations and uncertainty.
+7. Explicit status: conjectured, observed agreement, independently reproduced,
+   or formally proved under named assumptions.
+
+A minimal external runner should execute the exported program without access to
+the discovery system's private mutable state. Report unavailable dependencies,
+restricted inputs or failed checks as incomplete reproduction rather than
+success. Validate hashes and environment compatibility before execution; use
+bounded execution for received artifacts. Reproduction costs count in total
+discovery costs.
+
+Distinguish replay of the same artifact from an independently implemented
+replication and from validation against new external measurements. Record which
+occurred. Reproducing a waveform or image establishes the declared rendering
+claim within tolerance, not the unique original instruments, scene or causal
+history. Formal claims require a machine-checkable certificate and a named
+checker/assumption set; empirical matches must not be presented as universal
+proofs.
+
+### 11.4 External feedback closes the learning loop
+
+The observer can report reproducibility outcomes, comprehension difficulties,
+alternative explanations and counterexamples. Link each feedback record to the
+exact claim, package, explanation and communication-contract versions. Record
+observer role, environment, attempted procedure, actual outputs, tolerances,
+evidence origin and any reproduction independence.
+
+Route feedback according to its meaning:
+
+- Execution/reproduction failure -> artifact, dependency, runtime or semantic diagnosis.
+- Misunderstanding -> vocabulary negotiation or explanation revision.
+- New conflicting observation -> prediction diagnosis and model/measurement experiments.
+- Successful replication -> scoped evidence for the reproduced claim.
+- New question or proposed intervention -> candidate experiment, with its own cost.
+
+Self-play role agreement is synthetic/internal feedback; never relabel it as an
+independent external confirmation. Communication optimization must not reward
+persuasiveness, approval or verbosity as substitutes for accuracy. Separate
+comprehension, faithfulness, reproducibility, predictive calibration and transfer
+metrics. An observer can understand a wrong explanation or reproduce a wrong
+model; preserve those distinct outcomes.
+
+The loop becomes: input/context -> recorded prediction and explanation ->
+outcome comparison -> surprise or agreement -> targeted experiment ->
+versioned knowledge revision -> exported explanation/program -> external
+reproduction and comprehension feedback -> further investigation.
+
+Trust should be supported by an inspectable history of successful predictions,
+faithful explanations, independent reproduction and openly retained failures.
+Mastery remains scoped to tested conditions, including changed inputs and
+interventions; observer approval alone cannot establish it.
+
+### 11.5 Implementation and acceptance gates
+
+| Milestone | Deliverable | Acceptance evidence |
+|---|---|---|
+| G1c | Prediction, communication-contract and observer-feedback schemas linked to provenance | Predictions immutable after outcome; units/versions checked; feedback tied to exact claims |
+| G3b | Exported executable explanation/claim package and minimal reproduction runner | Fresh-process execution without private state; missing/tampered dependencies rejected; tolerances reported |
+| G4b | Audience-adaptive explanation and clarification protocol | Faithful expansion to agreed vocabulary; separately measured comprehension and correctness |
+| G6b | Surprise diagnosis and external-feedback-driven experiment selection | Noise controls, recorded alternatives, independent predictive improvement at matched cost |
+| G10b | Independent reproduction and task-mastery evaluation | Separate replay, independent implementation, new measurements and proof outcomes; scoped trust report |
+
+Implement G1c alongside G1b/G2a record integration, then G3b once program and
+runtime identities can be exported reliably. G4b depends on faithful program
+rendering; G6b depends on prediction scoring and experiment selection. Use
+explicit evaluator-only feedback during frozen tests; observer feedback used for
+training cannot also count as untouched held-out evaluation. No new general
+synthesis engine is required by this extension.
+
+## 12. Communicating knowledge gaps and collaborative discovery
+
+**Architectural requirement:** Expose the current explanation, its unresolved
+gaps and the evidence needed to address them in the agreed observer language.
+A person or another system may contribute knowledge, experience, analogies,
+measurements, experiments or partial programs. Participants may address different
+aspects and compose a shared explanatory program through validated interfaces.
+This is a proposed distributed capability, not an implemented agent network.
+
+### 12.1 A knowledge-gap report is an actionable scientific object
+
+For each unresolved issue, publish a versioned report referencing the exact
+prediction, explanation, observation and evidence records. Include:
+
+- What is currently explained, the supported scope and the remaining residual.
+- The predicted outcome/distribution and observed outcome, with units, uncertainty,
+  comparison metric and the location/time/conditions of the discrepancy.
+- Known limitations, missing observations and alternative hypotheses.
+- A diagnosis status: unexamined, suspected measurement error, irreducible noise,
+  representation limitation, model conflict, missing mechanism or unresolved
+  identifiability. These are hypotheses until tested.
+- Prior attempts and counterexamples, unresolved dependencies, resource limits
+  and why the issue matters for the task.
+- A concrete help request: clarify a concept, suggest a mechanism, supply a
+  measurement, design a discriminating test, implement a component or reproduce
+  a result.
+- Acceptance criteria and an executable minimal reproducer where available.
+
+Surprise measures unexpected outcomes under a particular model; it does not
+measure every knowledge gap. The system may have broad uncertainty or multiple
+indistinguishable explanations without experiencing a surprising outcome.
+Report those gaps too. Describe measured model discrepancies rather than
+asserting a subjective experience of surprise or introspective certainty.
+
+### 12.2 Contributions become testable candidates
+
+Allow contributions in the negotiated vocabulary, with source, authorship,
+version, assumptions, intended scope and dependencies. Preserve a natural-language
+suggestion and its proposed executable interpretation as linked but distinct
+artifacts. Seek clarification when their meaning is ambiguous, and expose that
+interpretation for correction before claiming it implements the suggestion.
+
+External knowledge may seed a hypothesis or method without being counted as
+autonomously discovered. Record whether a claim is externally supplied,
+internally generated, derived from prior knowledge or experimentally supported.
+Expertise and analogy guide search; they are not execution results or formal
+proofs. Keep contributed private knowledge within its declared access scope.
+
+Evaluate contributions against the original gap and reserved tests. A proposed
+solution may close, narrow, split or invalidate a gap; report the evidence and
+remaining limitations. Retain rejected alternatives and useful negative results.
+Do not silently erase the prediction that motivated the contribution.
+
+### 12.3 Decompose work and compose explanations
+
+Use a shared graph of claims, gaps, experiments, artifacts and dependencies.
+Assign bounded subproblems with explicit input/output types, units, assumptions,
+resource limits and required evidence. Roles can include proposer, representation
+investigator, program synthesizer, experiment designer, critic and reproducer;
+roles do not require separate model instances.
+
+Different participants may develop competing explanations or solve independent
+parts. Before integration, check representation/semantic compatibility, units,
+sampling conventions, uncertainty assumptions and dependency versions. Validate
+each component, then run end-to-end tests on the composed program; locally
+successful components can fail together. Attribute improvement and costs to
+their evidence lineage.
+
+Keep conflicting claims explicit until discriminating evidence is available.
+Agreement among participants does not establish truth. Repeated citations or
+copies of one result are one evidence lineage, not independent replications.
+Systems sharing a model, dataset or runtime may share failure modes; disclose
+these dependencies when reporting independent confirmation.
+
+Use explicit ownership/version checks for shared artifact updates. Bound work
+and stop duplicate or cyclic requests that produce no new evidence. Unproductive
+collaboration must return an unresolved-gap report, not recurse indefinitely.
+Communication overhead, reproduction and integration costs are part of the
+discovery budget. Track whether collaboration improves outcomes over a matched
+single-system baseline; additional participants alone are not an improvement.
+
+### 12.4 Collaborative output and acceptance gates
+
+The shared result consists of a versioned executable explanation and task-solving
+program, its component/dependency graph, evidence, contributor provenance,
+external reproduction reports and remaining gaps. Mastery reports remain scoped
+to tested capabilities. Better communication and a clearer unresolved question
+can be valuable intermediate outcomes even before a solution is found.
+
+| Milestone | Deliverable | Acceptance evidence |
+|---|---|---|
+| G1d | Versioned knowledge-gap and contribution contracts | Reports reference exact predictions/claims; supplied knowledge and derived evidence distinguished |
+| G4c | Observer dialogue that turns gaps and suggestions into testable work | Faithful translation, clarification handling and contribution attribution |
+| G5b | Shared claim/gap graph and typed partial-program composition | Component compatibility, conflict preservation, dependency invalidation and end-to-end reproduction |
+| G6c | Bounded collaborative experiment coordination | No evidence-free request cycles; cost accounting; improved gap resolution against matched controls |
+| G10c | Independent collaborative mastery evaluation | Traceable contributions, correlated-evidence controls, transfer and reproducibility on external tasks |
+
+Implement G1d alongside G1c, reuse the existing provenance and registry mechanisms,
+and add G4c after the observer language/feedback contract works. G5b/G6c follow
+portable reproduction and bounded task execution. No external messages or work
+dispatch are performed merely by introducing these contracts; actual interaction
+requires the relevant user-authorized channel.
+
+## 13. Environmental knowledge intake, bounded work and shared experiments
+
+**Architectural requirement:** Accept environmental information independently
+of the task instance being solved. Partial explanations, executable programs,
+tools, experiment protocols, measurements and reproduction reports may improve
+the system's knowledge and capabilities after compatibility and evidence checks.
+Maintain a persistent backlog of useful unresolved surprises and experiments.
+Delegation and partitioning are optional means of resolving that backlog under
+explicit cost and progress limits. These remain proposed capabilities.
+
+### 13.1 Separate task input, environmental knowledge and control
+
+Maintain three logically distinct interfaces:
+
+| Interface | Content | Effect |
+|---|---|---|
+| Task input | Problem specification, allowed observations, requested output and success criteria | Defines the current problem |
+| Environmental knowledge | External claims, partial programs, tools, measurements, experiment packages and feedback | Proposes knowledge/capability updates or new investigative work |
+| Authorized control | Goals, budgets, permissions, evaluation policy and lifecycle decisions | Governs what may be executed, adopted or delegated |
+
+Attach source, time, content identity, version and evidence lineage to intake.
+Environmental information cannot silently redefine the task, grant permissions
+or lower acceptance criteria. A contributed program is data until explicit
+bounded execution; receipt is not execution or adoption. Validate dependencies,
+types, units, assumptions and required capabilities before trial.
+
+Distinguish external measurements from explanations of those measurements, and
+both from programs proposing to reproduce them. Track exposure to external
+solutions: they can legitimately teach the system but cannot then be counted as
+unaided discoveries or unseen evaluation evidence.
+
+### 13.2 Trial before integration
+
+Use the existing registry, ledger and execution boundaries rather than creating
+a competing knowledge authority. Intake progresses through received -> candidate
+-> isolated trial -> evaluated -> admitted, rejected or deferred. Admission
+requires a stated scope and a versioned evidence record; rejection preserves the
+reason and context. Integration must be reversible.
+
+Evaluate a candidate against the existing system using explicit baseline and
+candidate versions, the affected task/knowledge scope, existing compatible
+evidence, reserved tests, regression checks and measured costs. Report accuracy,
+prediction, reproduction, complexity and cost separately. An improvement in one
+metric may incur a documented tradeoff; do not call it an unconditional gain.
+Record externally supplied knowledge and improvements independently of the
+system's own synthesis discoveries.
+
+A program can be a useful partial component without explaining the whole task.
+Attach unresolved assumptions and typed input/output contracts, then validate
+the composed solution end to end. Admission must invalidate or recheck affected
+dependents when a dependency changes or is retired.
+
+### 13.3 Prevent circular evidence and repeated wrong turns
+
+Use content/dependency hashes and claim lineage to recognize exact duplicates,
+renamed wrappers and copied evidence where detectable. Semantic similarity may
+suggest a duplicate but is not proof of equivalence. Detect provenance cycles:
+a claim returning through another participant has acquired no independent
+support merely by circulating.
+
+Before attempting work, consult compatible prior trials, failures and current
+dependencies. A work identity includes the target gap, candidate/program,
+evidence/data scope, dependency versions, evaluation protocol and relevant
+execution conditions. Do not repeat a completed deterministic attempt unchanged.
+Allow stochastic replication when the protocol calls for it; each replicate
+uses an explicit seed/sample and a bounded replication budget.
+
+An unsuccessful empirical trial is scoped evidence, not a universal
+impossibility proof. Reopen a failed direction when new data, a changed program
+or dependency, a revised assumption, a larger justified budget or a genuinely
+different test can change the conclusion. Record the reopening reason.
+Failures without such changes remain recorded rather than being redispatched.
+
+Delegation cannot route work back to an ancestor as purported new work. Bound
+depth, retries, fan-out, execution and communication under one parent budget.
+Stop or defer work with repeated equivalent outputs and no relevant evidence,
+capability or uncertainty change. A clearer gap, eliminated alternative or
+valid negative result can count as progress; additional messages and task
+creation alone cannot. Report a scoped unresolved result when exhausted.
+
+### 13.4 Persistent experiment and surprise backlog
+
+Each item references a claim/gap and contains the question, relevant surprise or
+uncertainty, prior attempts, candidate experiment, expected informative outcome,
+acceptance/stop criteria, dependencies, estimated cost, owner/lease and budget.
+Track statuses proposed, ready, running, blocked, deferred, resolved, rejected
+and superseded with recorded transitions. Keep evidence-backed outcomes separate
+from predicted utility.
+
+Prioritize work by task relevance, plausible information/competence gain,
+novelty, dependency readiness, uncertainty and cost. These are scheduling
+estimates, not credited discoveries. Reserve bounded exploration and retain
+diverse stepping stones; periodically consolidate duplicate/superseded items
+and archive low-value work rather than allowing unlimited backlog growth.
+Blocked items need a specific missing dependency and a wake-up condition.
+
+Partition work only where subproblem interfaces and acceptance criteria are
+explicit. Delegate bounded work packets containing permitted inputs, claim/gap
+identity, executable context, requested result/evidence and limits. Merge through
+one accountable result owner with version checks, conflict handling and
+end-to-end validation. Participant count, repeated approval or task completion
+does not itself establish improved task performance.
+
+Share experiments as versioned packages with a distinct protocol, data and
+result identity. Participants report the actual environment, procedure,
+observations and failures. Preserve evaluator-only ground truth and access
+boundaries when sharing, and label reused evidence rather than charging it as
+a fresh independent experiment.
+
+### 13.5 Implementation and acceptance gates
+
+| Milestone | Deliverable | Acceptance evidence |
+|---|---|---|
+| G1e | Distinct environmental intake and versioned candidate-update records | Task/control boundaries preserved; source and dependency identity; no execution on receipt |
+| G3c | Baseline/candidate integration trials and reversible admission | Independent scoped utility, regression evidence, measured cost and dependency-aware rollback |
+| G4d | Persistent experiment/surprise backlog and bounded scheduler | Deduplication, ready/blocked/deferred states, explicit wake-up/stop criteria and no unchanged deterministic retries |
+| G6d | Shared experiment and delegation protocol | No provenance/delegation cycles; scoped failures can reopen on changed evidence; total parent budget enforced |
+| G10d | Collaborative efficiency evaluation | Acquisition/integration/communication costs included; compare against matched single-system and no-external-knowledge controls |
+
+Extend G1c/G1d records with G1e; integrate G3c with the existing admission path.
+Build G4d before expanding distributed execution. Start with a single-process
+backlog and executor to establish correct transitions, evidence reuse and stop
+behavior; add participant transport after G3b/G5b contracts work. Evaluate
+efficiency on actual task resolution and informative partial outcomes rather
+than promising that every open-ended discovery task will converge.
