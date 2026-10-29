@@ -144,3 +144,77 @@ A discovered method must not be promoted based solely on performance on the task
 Retain the current typed AST interpreter, bounded search, discovery/admission, failure accounting, generated-task benchmarks and provenance machinery as a symbolic kernel. The current F1–F4 feature heuristics and operator-frequency policy are *prototypes*, not proof of domain-independent meta-learning. Their arithmetic/pair-specific feature shortcuts should not be the architecture's long-term dependency.
 
 Explicitly separate **observation-method learning**, **feature/representation learning**, **operator/program learning**, and **search-policy learning**. Each produces versioned reusable artifacts with evidence, dependency graphs and rollback. This design is a research hypothesis; empirical validation must precede claims of general scientific discovery.
+
+## 10. Autonomous generative experimentation and developmental curricula
+
+**Architectural requirement:** The engine must be able to generate new experimental data, tasks, worlds, interventions and measurement procedures to learn how to discover models. This is distinct from fitting an external dataset. Generated experiments may train observation methods, feature detectors, operators, programs and search policies, and may probe the behavior of competing hypotheses.
+
+### 10.1 Experimental objects and provenance
+
+An experiment specification is an executable, versioned object containing:
+
+- A generator program or simulator, its dependency digests, types, units, assumptions and validity limits.
+- Variables, controllable factors, initial/boundary conditions, distributions, noise and interventions.
+- Observation methods, sampling and measurement settings; available ground truth and what remains latent.
+- Random seed, deterministic replay requirements, resource and safety limits.
+- A declared goal: exploration, training, falsification, validation, robustness, or transfer.
+- Split assignments and complete provenance lineage linking synthetic outputs to the generating mechanism.
+- Evaluation protocol, costs, results, failures and subsequent changes in discovery competence.
+
+Generated data is evidence **of the generator's behavior**, not independent confirmation that its mechanism is true in nature. Model-generated training data cannot be promoted as real-world validation of that same model. Preserve immutable external observations and isolate synthetic evidence from independent measurements.
+
+### 10.2 Generic experiment-generation actions
+
+Use a typed experiment grammar with domain adapters, not a hand-authored set of music-specific lessons. Search actions include:
+
+1. Sample new parameter combinations, input conditions, perturbations and noise models.
+2. Compose or mutate existing executable mechanisms and observation procedures.
+3. Construct counterexamples and adversarial cases for competing hypotheses.
+4. Vary resolution, sampling, measurement noise, missingness and sensor placement.
+5. Generate interventions that distinguish observationally equivalent hypotheses when possible.
+6. Produce out-of-distribution compositions and cross-family transfer tasks.
+7. Propose simpler subproblems, curriculum transitions or new environment simulators.
+8. Execute, measure, compare and persist outcomes in a sandbox.
+
+Generators themselves can be proposed, evaluated, revised and retained as reusable artifacts. Keep generator quality distinct from solver performance. A generator that produces trivial, repetitive or misleading tasks must not earn high utility merely because its own tasks are solved easily.
+
+### 10.3 Competence-progress curriculum
+
+Allocate experiments by estimated **improvement in future capability per unit cost**, not by raw success rate or synthetic data volume. Candidate objectives include predictive/reconstruction improvement on independent tasks, new reusable abstraction discovery, discrimination between hypotheses, calibration improvement and cross-family transfer. Track uncertainty and novelty; reserve exploration for under-tested task families and alternative generators.
+
+Use a competence map indexed by observable task properties (dimensions, time dependence, compositional depth, noise, number of latent factors, identifiability and required representation changes), rather than hidden generator-family labels. Maintain prerequisites and transferable skills, but allow revisiting simpler experiments when harder tasks expose missing foundations.
+
+Prevent reward hacking: hold out independent evaluation suites; freeze curricula/policies during tests; measure total compute, generator construction cost and negative transfer. Include random curricula, fixed complexity curricula, passive training and no-synthetic-data controls.
+
+### 10.4 Generative model-discovery cycle
+
+```text
+Existing hypotheses / methods / policies
+  -> propose experimental world or perturbation
+  -> execute generator, recording mechanism and provenance
+  -> observe through one or more candidate observation methods
+  -> discover / fit explanatory programs without access to generator AST
+  -> compare with known synthetic mechanism and held-out generated cases
+  -> evaluate transfer on separate generators and real observations
+  -> revise representations, operators, hypotheses, policy and curriculum
+  -> evidence-gated registration of reusable discoveries
+```
+
+For real-world scientific claims, require external evidence or actual interventions. The known synthetic ground truth may be used by the **evaluator** but never by the learner or feature-selection policy at test time. Counterexample generation must not silently leak expected answers into the discovery inputs.
+
+### 10.5 Progressive audio illustration, not a domain-specific policy
+
+A general generator could first create simple periodic signals, then mixtures, modulation, transients, event sequences and hierarchical compositions. The learner should discover and reuse observation transforms and mechanisms across stages. Real music is evaluated independently, with separate scores for waveform fidelity, transcription, source attribution and explanatory uncertainty. Success on synthetic audio alone does not imply real-recording reconstruction or exact source identification.
+
+### 10.6 Implementation extension and acceptance gates
+
+| Milestone | Deliverable | Acceptance gate |
+|---|---|---|
+| G2a | Typed synthetic experiment and dataset provenance API | Deterministic replay, immutable lineage, split isolation and resource bounds |
+| G2b | Generic mechanism/perturbation/intervention generator | Diverse experiments without access to target answers; validity checks |
+| G3a | Generator quality and curriculum competence registry | Detect triviality, duplicates, distribution collapse and misleading synthetic data |
+| G4a | Adaptive competence-progress experiment scheduler | Beats matched-compute random/fixed curricula on frozen unseen tasks |
+| G6a | Hypothesis-discriminating synthetic and real experiment proposals | Improves calibrated discrimination while preserving evidence provenance |
+| G8a | Progressive synthetic audio generative benchmark | Demonstrates transfer to unseen mechanisms and independently sampled recordings |
+
+**Implementation order:** Couple G1 observation contracts with G2a experiment provenance before training from synthetic data; then implement generic perturbation and mechanism composition, frozen independent evaluation, and adaptive curricula. Do not claim validated autonomous scientific discovery before cross-domain external tests.
